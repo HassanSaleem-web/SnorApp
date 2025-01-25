@@ -22,7 +22,7 @@ const SignUpPage = () => {
       const idToken = await result.user.getIdToken();
       console.log(idToken);
 
-      const response = await fetch("http://localhost:3000/api/auth/google-signin", {
+      const response = await fetch("https://snorbackend.onrender.com/api/auth/google-signin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ idToken, role }),
