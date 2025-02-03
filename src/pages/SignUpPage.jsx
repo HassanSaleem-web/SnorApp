@@ -20,7 +20,7 @@ const SignUpPage = () => {
     try {
       const result = await signInWithPopup(auth, provider);
       const idToken = await result.user.getIdToken();
-      console.log(idToken);
+     
 
       const response = await fetch("https://snorbackend.onrender.com/api/auth/google-signin", {
         method: "POST",

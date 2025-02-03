@@ -204,7 +204,7 @@ const MapComponent = () => {
     };
 
     try {
-      const response = await fetch("http://localhost:3000/api/project", {
+      const response = await fetch("https://snorbackend.onrender.com/api/project", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
