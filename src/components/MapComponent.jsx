@@ -229,7 +229,7 @@ const MapComponent = () => {
       if (response.ok) {
         alert("Project saved successfully!");
         console.log("Saved Project:", data.project);
-        navigate("/dashboard");
+        
       } else {
         alert(data.message || "Failed to save project.");
       }
