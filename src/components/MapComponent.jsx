@@ -25,6 +25,7 @@ const MapComponent = () => {
   const [projectName, setProjectName] = useState("");
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState("Active");
+  const [adminEmail, setAdminEmail] = useState("");
 
   // Address-related state
   const [center, setCenter] = useState({ lat: 28.626137, lng: 79.821603 });
@@ -43,33 +44,6 @@ const MapComponent = () => {
     height: "500px",
   };
 
-  const polygonOptions = {
-    fillOpacity: 0.3,
-    fillColor: "#ff0000",
-    strokeColor: "#ff0000",
-    strokeWeight: 2,
-    draggable: true,
-    editable: true,
-  };
-
-  const polylineOptions = {
-    strokeColor: "#0000ff",
-    strokeWeight: 3,
-    draggable: true,
-    editable: true,
-  };
-
-  const drawingManagerOptions = {
-    drawingControl: true,
-    drawingControlOptions: {
-      position: window.google?.maps?.ControlPosition?.TOP_CENTER,
-      drawingModes: [
-        window.google?.maps?.drawing?.OverlayType?.POLYGON,
-        window.google?.maps?.drawing?.OverlayType?.POLYLINE,
-      ],
-    },
-  };
-
   const geocodeAddress = async (address) => {
     const geocoder = new window.google.maps.Geocoder();
     return new Promise((resolve, reject) => {
@@ -85,7 +59,6 @@ const MapComponent = () => {
 
   useEffect(() => {
     if (isLoaded && state?.address) {
-      // Geocode the address passed from UserDashboard
       geocodeAddress(state.address)
         .then((location) => {
           const position = { lat: location.lat(), lng: location.lng() };
@@ -97,78 +70,15 @@ const MapComponent = () => {
           alert("Unable to find the entered address.");
         });
     }
+
+    // Fetch the admin email from local storage
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (user && user.email) {
+      setAdminEmail(user.email);
+    }
   }, [isLoaded, state]);
 
-  const onLoadMap = (map) => {
-    mapRef.current = map;
-  };
-
-  const onLoadPolygon = (polygon, index) => {
-    polygonRefs.current[index] = polygon;
-  };
-
-  const onLoadPolyline = (polyline, index) => {
-    polylineRefs.current[index] = polyline;
-  };
-
-  const onOverlayComplete = ($overlayEvent) => {
-    const { type, overlay } = $overlayEvent;
-
-    if (type === window.google.maps.drawing.OverlayType.POLYGON) {
-      const newPolygon = overlay
-        .getPath()
-        .getArray()
-        .map((latLng) => ({ lat: latLng.lat(), lng: latLng.lng() }));
-
-      overlay.setMap(null);
-      setPolygons([...polygons, newPolygon]);
-      calculateArea(newPolygon);
-    }
-
-    if (type === window.google.maps.drawing.OverlayType.POLYLINE) {
-      const newPolyline = overlay
-        .getPath()
-        .getArray()
-        .map((latLng) => ({ lat: latLng.lat(), lng: latLng.lng() }));
-
-      overlay.setMap(null);
-      setPolylines([...polylines, newPolyline]);
-      calculatePolylineLength(newPolyline);
-    }
-  };
-
-  const calculateArea = (polygon) => {
-    if (window.google && window.google.maps.geometry) {
-      const googlePolygon = new window.google.maps.Polygon({
-        paths: polygon,
-      });
-      const areaInSquareMeters = window.google.maps.geometry.spherical.computeArea(
-        googlePolygon.getPath()
-      );
-      setArea(areaInSquareMeters);
-    }
-  };
-
-  const calculatePolylineLength = (polyline) => {
-    if (window.google && window.google.maps.geometry) {
-      const googlePolyline = new window.google.maps.Polyline({
-        path: polyline,
-      });
-      const lengthInMeters = window.google.maps.geometry.spherical.computeLength(
-        googlePolyline.getPath()
-      );
-      setPolylineLength(lengthInMeters);
-    }
-  };
-
-  const clearMap = () => {
-    setPolygons([]);
-    setPolylines([]);
-    setArea(0);
-    setPolylineLength(0);
-  };
-
-  const saveProject = () => {
+  const saveProject = async () => {
     if (!projectName.trim()) {
       alert("Please enter a project name.");
       return;
@@ -182,18 +92,49 @@ const MapComponent = () => {
       return;
     }
 
+    // Prepare the project data
     const projectData = {
-      projectName,
+      name: projectName,
       description,
       status,
-      polygons,
-      polylines,
+      admin: adminEmail,
+      address: state?.address || "Unknown",
+      polygons: polygons.map((polygon) => ({
+        coordinates: polygon,
+        addedBy: adminEmail, // or the user adding the polygon
+      })),
+      polylines: polylines.map((polyline) => ({
+        coordinates: polyline,
+        addedBy: adminEmail, // or the user adding the polyline
+      })),
       totalArea: area,
       totalLength: polylineLength,
     };
 
-    console.log("Saved Project Data:", projectData);
-    alert("Project saved successfully! Check the console for details.");
+    try {
+      // Send the project data to the backend
+      const token = localStorage.getItem("token");
+      const response = await fetch("http://localhost:3000/api/projects", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(projectData),
+      });
+
+      if (response.ok) {
+        alert("Project saved successfully!");
+        navigate("/dashboard");
+      } else {
+        const errorData = await response.json();
+        console.error("Error saving project:", errorData.message);
+        alert("Failed to save project. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error saving project:", error);
+      alert("An error occurred while saving the project.");
+    }
   };
 
   return isLoaded ? (
@@ -201,40 +142,42 @@ const MapComponent = () => {
       <div className="navbar">
         <button onClick={() => navigate("/dashboard")}>Dashboard</button>
         <button onClick={saveProject}>Save Project</button>
-        <button onClick={clearMap}>Clear Map</button>
         <button onClick={() => navigate(-1)}>Back</button>
       </div>
 
       <GoogleMap
         zoom={15}
         center={center}
-        onLoad={onLoadMap}
+        onLoad={(map) => (mapRef.current = map)}
         mapContainerStyle={containerStyle}
       >
         <DrawingManager
-          onOverlayComplete={onOverlayComplete}
-          options={drawingManagerOptions}
+          onOverlayComplete={({ type, overlay }) => {
+            if (type === window.google.maps.drawing.OverlayType.POLYGON) {
+              const newPolygon = overlay
+                .getPath()
+                .getArray()
+                .map((latLng) => ({ lat: latLng.lat(), lng: latLng.lng() }));
+              overlay.setMap(null);
+              setPolygons([...polygons, newPolygon]);
+              calculateArea(newPolygon);
+            } else if (type === window.google.maps.drawing.OverlayType.POLYLINE) {
+              const newPolyline = overlay
+                .getPath()
+                .getArray()
+                .map((latLng) => ({ lat: latLng.lat(), lng: latLng.lng() }));
+              overlay.setMap(null);
+              setPolylines([...polylines, newPolyline]);
+              calculatePolylineLength(newPolyline);
+            }
+          }}
         />
         {markerPosition && <Marker position={markerPosition} />}
         {polygons.map((polygon, index) => (
-          <Polygon
-            key={`polygon-${index}`}
-            onLoad={(event) => onLoadPolygon(event, index)}
-            options={polygonOptions}
-            paths={polygon}
-            draggable
-            editable
-          />
+          <Polygon key={index} paths={polygon} options={{ fillColor: "#ff0000" }} />
         ))}
         {polylines.map((polyline, index) => (
-          <Polyline
-            key={`polyline-${index}`}
-            onLoad={(event) => onLoadPolyline(event, index)}
-            options={polylineOptions}
-            path={polyline}
-            draggable
-            editable
-          />
+          <Polyline key={index} path={polyline} options={{ strokeColor: "#0000ff" }} />
         ))}
       </GoogleMap>
 
@@ -262,51 +205,6 @@ const MapComponent = () => {
             <option value="Completed">Completed</option>
           </select>
         </label>
-      </div>
-
-      <div className="details">
-        <div>
-          <h3>Polygon Coordinates:</h3>
-          {polygons.length > 0 ? (
-            polygons.map((polygon, idx) => (
-              <ul key={`polygon-${idx}`}>
-                <li><strong>Polygon {idx + 1}:</strong></li>
-                {polygon.map((coord, i) => (
-                  <li key={i}>
-                    Lat: {coord.lat.toFixed(6)}, Lng: {coord.lng.toFixed(6)}
-                  </li>
-                ))}
-              </ul>
-            ))
-          ) : (
-            <p>No polygons drawn yet.</p>
-          )}
-        </div>
-        <div>
-          <h3>Total Polygon Area:</h3>
-          <p>{area.toFixed(2)} m²</p>
-        </div>
-        <div>
-          <h3>Polyline Coordinates:</h3>
-          {polylines.length > 0 ? (
-            polylines.map((polyline, idx) => (
-              <ul key={`polyline-${idx}`}>
-                <li><strong>Polyline {idx + 1}:</strong></li>
-                {polyline.map((coord, i) => (
-                  <li key={i}>
-                    Lat: {coord.lat.toFixed(6)}, Lng: {coord.lng.toFixed(6)}
-                  </li>
-                ))}
-              </ul>
-            ))
-          ) : (
-            <p>No polylines drawn yet.</p>
-          )}
-        </div>
-        <div>
-          <h3>Total Polyline Length:</h3>
-          <p>{polylineLength.toFixed(2)} m</p>
-        </div>
       </div>
     </div>
   ) : null;
