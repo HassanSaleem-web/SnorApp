@@ -180,31 +180,42 @@ const MapComponent = () => {
       alert("Please draw at least one shape (polygon or polyline).");
       return;
     }
-
+  
     const token = localStorage.getItem("token");
     if (!token) {
       alert("User not authenticated. Please log in.");
       navigate("/login");
       return;
     }
-
+  
+    const userEmail = JSON.parse(localStorage.getItem("user"))?.email || "unknown";
+  
     const projectData = {
       projectName,
       description,
       status,
       address: state?.address || "Unknown Address",
+      admin: userEmail,
       polygons: polygons.map((polygon) => ({
-        coordinates: polygon,
+        coordinates: polygon.map((point) => ({
+          lat: point.lat,
+          lng: point.lng,
+        })),
+        addedBy: userEmail,
       })),
       polylines: polylines.map((polyline) => ({
-        coordinates: polyline,
+        coordinates: polyline.map((point) => ({
+          lat: point.lat,
+          lng: point.lng,
+        })),
+        addedBy: userEmail,
       })),
       totalArea: area,
       totalLength: polylineLength,
     };
-
+  
     try {
-      const response = await fetch("https://snorbackend.onrender.com/api/project", {
+      const response = await fetch("http://localhost:3000/api/project", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -212,13 +223,13 @@ const MapComponent = () => {
         },
         body: JSON.stringify(projectData),
       });
-
+  
       const data = await response.json();
-
+  
       if (response.ok) {
         alert("Project saved successfully!");
         console.log("Saved Project:", data.project);
-        navigate("/dashboard");
+       
       } else {
         alert(data.message || "Failed to save project.");
       }
@@ -227,7 +238,7 @@ const MapComponent = () => {
       alert("An error occurred while saving the project. Please try again.");
     }
   };
-
+  
   return isLoaded ? (
     <div className="map-container">
       <div className="navbar">
