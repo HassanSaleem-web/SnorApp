@@ -198,14 +198,14 @@ const MapComponent = () => {
       admin: userEmail,
       polygons: polygons.map((polygon) => ({
         coordinates: polygon.map((point) => ({
-          lat: point.lat,
+          lat: point.lat,  // Ensure correct lat/lng structure
           lng: point.lng,
         })),
         addedBy: userEmail,
       })),
       polylines: polylines.map((polyline) => ({
         coordinates: polyline.map((point) => ({
-          lat: point.lat,
+          lat: point.lat,  // Ensure correct lat/lng structure
           lng: point.lng,
         })),
         addedBy: userEmail,
@@ -229,7 +229,7 @@ const MapComponent = () => {
       if (response.ok) {
         alert("Project saved successfully!");
         console.log("Saved Project:", data.project);
-       
+        navigate("/dashboard");
       } else {
         alert(data.message || "Failed to save project.");
       }
@@ -238,6 +238,7 @@ const MapComponent = () => {
       alert("An error occurred while saving the project. Please try again.");
     }
   };
+  
   
   return isLoaded ? (
     <div className="map-container">
