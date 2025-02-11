@@ -190,6 +190,10 @@ const MapComponent = () => {
   
     const userEmail = JSON.parse(localStorage.getItem("user"))?.email || "unknown";
   
+    // **Debugging: Checking what data is being sent**
+    console.log("Polygons before sending:", polygons);
+    console.log("Polylines before sending:", polylines);
+  
     const projectData = {
       projectName,
       description,
@@ -214,8 +218,10 @@ const MapComponent = () => {
       totalLength: polylineLength,
     };
   
+    console.log("Final project data being sent:", JSON.stringify(projectData, null, 2));
+  
     try {
-      const response = await fetch("https://snorbackend.onrender.com/api/project", {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/project`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -228,8 +234,9 @@ const MapComponent = () => {
   
       if (response.ok) {
         alert("Project saved successfully!");
-        console.log("Saved Project:", data.project);
+        console.log("Saved Project Response:", data.project);
       } else {
+        console.error("Backend error response:", data);
         alert(data.message || "Failed to save project.");
       }
     } catch (error) {
@@ -240,10 +247,11 @@ const MapComponent = () => {
   
   
   
+  
   return isLoaded ? (
     <div className="map-container">
       <div className="navbar">
-        <button onClick={() => navigate("/dashboard")}>Dashboard</button>
+        <button onClick={() => navigate("/dashboard-user")}>Dashboard</button>
         <button onClick={saveProject}>Save Project</button>
         <button onClick={clearMap}>Clear Map</button>
         <button onClick={() => navigate(-1)}>Back</button>

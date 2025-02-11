@@ -1,208 +1,386 @@
 /* General Container */
 .dashboard-container {
-    font-family: "Inter", sans-serif;
-    padding: 20px;
-    background-color: #2a519e;
-    min-height: 100vh;
+  font-family: "Inter", sans-serif;
+  padding: 20px;
+  background-color: #f3f6fc; /* Lighter background for better contrast */
+  min-height: 100vh;
+}
+
+/* Navbar Styling */
+.dashboard-navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #1f2937; /* Dark gray background */
+  padding: 15px 20px;
+  border-radius: 10px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-navbar h1 {
+  font-size: 24px;
+  color: #ffffff; /* White for better contrast */
+}
+
+/* Navbar Buttons */
+.dashboard-navbar button {
+  background-color: #10b981; /* Green button color */
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-left: 10px;
+}
+
+.dashboard-navbar button:hover {
+  background-color: #0e8c6e;
+  transform: translateY(-2px);
+  box-shadow: 0px 6px 14px rgba(16, 163, 127, 0.3);
+}
+
+/* Search Dropdown Wrapper */
+.dashboard-search-dropdown {
+  position: relative;
+  max-width: 600px;
+  margin: 20px auto;
+}
+
+.dashboard-search-dropdown input {
+  width: 100%;
+  padding: 12px 15px;
+  border-radius: 20px;
+  border: 1px solid #e0e0e0;
+  background-color: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+  transition: all 0.3s ease;
+}
+
+.dashboard-search-dropdown input:focus {
+  outline: none;
+  border-color: #10b981; /* Green focus border */
+  box-shadow: 0 4px 8px rgba(16, 163, 127, 0.2);
+}
+
+/* Dropdown List Styling */
+.dashboard-search-dropdown-list {
+  position: absolute;
+  top: 50px; /* Slightly below the input */
+  left: 0;
+  right: 0;
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 1000;
+  padding: 0;
+}
+
+/* Dropdown List Item Styling */
+.dashboard-search-dropdown-item {
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.dashboard-search-dropdown-item:hover {
+  background-color: #f3f6fc;
+  color: #007bff;
+}
+
+/* Request Access Button Inside Dropdown */
+.dashboard-request-access-btn {
+  background-color: #3b82f6; /* Blue button for action */
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.dashboard-request-access-btn:hover {
+  background-color: #2563eb;
+}
+
+/* Scrollbar Styling */
+.dashboard-search-dropdown-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dashboard-search-dropdown-list::-webkit-scrollbar-thumb {
+  background-color: #007bff;
+  border-radius: 10px;
+}
+
+.dashboard-search-dropdown-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+/* Table Styling */
+.dashboard-projects-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 10px;
+}
+
+.dashboard-projects-table th {
+  text-align: left;
+  padding: 12px 20px;
+  background-color: #1f2937; /* Match navbar color */
+  color: #ffffff; /* White text for contrast */
+  font-size: 16px;
+  font-weight: 600;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.dashboard-projects-table td {
+  padding: 12px 20px;
+  background-color: #ffffff;
+  color: #555;
+  font-size: 14px;
+  border-bottom: 1px solid #f0f0f0;
+  border-radius: 8px;
+}
+
+.dashboard-projects-table tr {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.dashboard-projects-table tr:hover {
+  transform: scale(1.01);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* Button Styling */
+.dashboard-projects-table button {
+  background-color: #10b981;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-right: 8px;
+}
+
+.dashboard-projects-table button:last-child {
+  margin-right: 0;
+}
+
+.dashboard-projects-table button:hover {
+  background-color: #0e8c6e;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 163, 127, 0.3);
+}
+
+/* Delete Button */
+.dashboard-delete-btn {
+  background-color: #ef4444;
+}
+
+.dashboard-delete-btn:hover {
+  background-color: #dc2626;
+  box-shadow: 0 4px 12px rgba(255, 71, 71, 0.3);
+}
+
+/* Section Header */
+.dashboard-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.dashboard-section-header h3 {
+  font-size: 24px;
+  color: #333;
+  font-weight: 700;
+  border-left: 6px solid #10b981;
+  padding-left: 10px;
+  margin: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .dashboard-navbar {
+    flex-wrap: wrap;
+    gap: 10px;
   }
-  
-  /* Navbar Styling */
-  .navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #1e1e2f;
-    padding: 15px 20px;
-    border-radius: 10px;
-    margin-bottom: 30px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  .navbar h1 {
-    font-size: 24px;
-    color: rgb(0, 0, 0);
-  }
-  
-  .navbar button {
-    background-color: #10a37f;
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-  
-  .navbar button:hover {
-    background-color: #0e8c6e;
-    transform: translateY(-2px);
-    box-shadow: 0px 6px 14px rgba(16, 163, 127, 0.3);
-  }
-  
-  /* Welcome Section */
-  .welcome-section h2 {
-    font-size: 32px;
-    color: #333;
-    margin-bottom: 20px;
-    font-weight: 700;
-  }
-  
-  /* Section Headers */
-  .projects-section h3 {
+
+  .dashboard-navbar h1 {
     font-size: 20px;
-    color: #555;
-    margin-bottom: 15px;
-    font-weight: 600;
   }
-  
-  /* Table Styling */
-  .projects-table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0 10px;
-  }
-  
-  .projects-table th {
-    text-align: left;
-    padding: 12px 20px;
-    background-color: #ffffff;
-    color: #444;
-    font-size: 16px;
-    font-weight: 600;
-    border-bottom: 2px solid #eee;
-  }
-  
-  .projects-table td {
-    padding: 12px 20px;
-    background-color: #ffffff;
-    color: #555;
-    font-size: 14px;
-    border-bottom: 1px solid #f0f0f0;
-    border-radius: 8px;
-  }
-  
-  .projects-table tr {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-  }
-  
-  .projects-table tr:hover {
-    transform: scale(1.01);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-  }
-  
-  .projects-table th:first-child,
-  .projects-table td:first-child {
-    border-top-left-radius: 10px;
-    border-bottom-left-radius: 10px;
-  }
-  
-  .projects-table th:last-child,
-  .projects-table td:last-child {
-    border-top-right-radius: 10px;
-    border-bottom-right-radius: 10px;
-  }
-  
-  /* Button Styling */
-  .projects-table button {
-    background-color: #0e8c6e;
-    color: white;
-    border: none;
+
+  .dashboard-navbar button {
     padding: 8px 12px;
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    margin-right: 8px;
+    font-size: 12px;
   }
-  
-  .projects-table button:last-child {
-    margin-right: 0;
+
+  .dashboard-projects-table th,
+  .dashboard-projects-table td {
+    font-size: 12px;
+    padding: 10px;
   }
-  
-  .projects-table button:hover {
-    background-color:#0e8c6e;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+
+  .dashboard-projects-table button {
+    padding: 6px 10px;
+    font-size: 12px;
   }
-  
-  /* Delete Button Special Styling */
-  .projects-table button.delete {
-    background-color: #ff5c5c;
+}
+/* Hide Button Styling */
+.dashboard-hide-btn {
+  background-color: #e5e7eb; /* Subtle light gray */
+  color: #374151; /* Dark gray for contrast */
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.dashboard-hide-btn:hover {
+  background-color: #d1d5db; /* Slightly darker gray on hover */
+  color: #1f2937; /* Slightly darker text */
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+/* Modal Overlay - Fullscreen with subtle transparency */
+.dashboard-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6); /* Darker transparency for better focus */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Ensures it stays on top */
+  animation: fadeIn 0.3s ease-in-out; /* Smooth fade-in animation */
+}
+
+/* Modal Content - Styled box */
+.dashboard-modal-content {
+  background-color: #ffffff;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 450px; /* Ensure it's not too wide */
+  padding: 30px 25px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+  text-align: center;
+  animation: scaleIn 0.3s ease-in-out; /* Smooth scaling animation */
+}
+
+/* Modal Heading */
+.dashboard-modal-content h3 {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #333333; /* Dark text for readability */
+}
+
+/* Input Field Styling */
+.dashboard-modal-content input {
+  width: 70%;
+  padding: 12px 15px;
+  font-size: 14px;
+  border: 1px solid #d1d9e6; /* Subtle border */
+  border-radius: 8px;
+  margin-bottom: 20px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1); /* Inner shadow for depth */
+  transition: border-color 0.3s ease;
+}
+
+.dashboard-modal-content input:focus {
+  border-color: #10a37f; /* Highlight border on focus */
+  outline: none;
+  box-shadow: inset 0 2px 6px rgba(16, 163, 127, 0.3); /* Slightly stronger shadow */
+}
+
+/* Modal Action Buttons */
+.dashboard-modal-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px; /* Add spacing between buttons */
+}
+
+/* Confirm Button */
+.dashboard-modal-actions button {
+  flex: 1; /* Equal button width */
+  padding: 12px 15px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+}
+
+/* Confirm Button - Specific */
+.dashboard-modal-actions button:first-child {
+  background-color: #10a37f;
+  color: white;
+  border: none;
+}
+
+.dashboard-modal-actions button:first-child:hover {
+  background-color: #0e8c6e;
+  box-shadow: 0 4px 10px rgba(16, 163, 127, 0.3);
+}
+
+/* Cancel Button */
+.dashboard-modal-actions button:last-child {
+  background-color: #e0e0e0;
+  color: #555555;
+  border: none;
+}
+
+.dashboard-modal-actions button:last-child:hover {
+  background-color: #d1d9e6;
+  color: #333333;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Animations for smoother UX */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
   }
-  
-  .projects-table button.delete:hover {
-    background-color: #e04141;
-    box-shadow: 0 4px 12px rgba(255, 92, 92, 0.3);
+  to {
+    opacity: 1;
   }
-  
-  /* Responsive Design */
-  @media (max-width: 768px) {
-    .navbar {
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-  
-    .navbar h1 {
-      font-size: 20px;
-    }
-  
-    .navbar button {
-      padding: 8px 12px;
-      font-size: 12px;
-    }
-  
-    .welcome-section h2 {
-      font-size: 24px;
-    }
-  
-    .projects-table th,
-    .projects-table td {
-      font-size: 12px;
-      padding: 10px;
-    }
-  
-    .projects-table button {
-      padding: 6px 10px;
-      font-size: 12px;
-    }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
   }
-  /* Section Header */
-.section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
+  to {
+    transform: scale(1);
+    opacity: 1;
   }
-  
-  .section-header h3 {
-    font-size: 24px;
-    color: #1e1e2f;
-    font-weight: 700;
-    border-left: 6px solid #10a37f;
-    padding-left: 10px;
-    margin: 0;
-  }
-  
-  /* Toggle Button */
-  .toggle-button {
-    background-color: #10a37f;
-    color: white;
-    border: none;
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-  
-  .toggle-button:hover {
-    background-color: #0e8c6e;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(16, 163, 127, 0.3);
-  }
-  
+}

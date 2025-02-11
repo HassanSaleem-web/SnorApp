@@ -5,71 +5,264 @@ import { useNavigate } from "react-router-dom";
 const UserDashboard = () => {
   const navigate = useNavigate();
   const [userName, setUserName] = useState("User");
+  const [adminProjects, setAdminProjects] = useState([]); // Dynamically fetched admin projects
+  const [linkedProjects, setLinkedProjects] = useState([]); // Placeholder if needed in the future
+  const [searchQuery, setSearchQuery] = useState("");
+  const [allProjects, setAllProjects] = useState([]); // Stores all projects except admin ones
+  const [filteredProjects, setFilteredProjects] = useState([]); // Stores search results
+  const [showDropdown, setShowDropdown] = useState(false); // Controls dropdown visibility
+  const [filteredAdminProjects, setFilteredAdminProjects] = useState([]);
   const [showAdminProjects, setShowAdminProjects] = useState(true);
   const [showLinkedProjects, setShowLinkedProjects] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filteredAdminProjects, setFilteredAdminProjects] = useState([]);
-  const [filteredLinkedProjects, setFilteredLinkedProjects] = useState([]);
   const [addressModalOpen, setAddressModalOpen] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState("");
+  const [requests, setRequests] = useState([]); // Store fetched requests
+  const [activeDropdown, setActiveDropdown] = useState(null); // Track the active dropdown
+  
 
-  const adminProjects = [
-    { id: 1, name: "Project 1", address: "123 Main St", status: "Active", linked: true },
-    { id: 2, name: "Project 2", address: "456 Elm St", status: "Completed", linked: false },
-  ];
-
-  const linkedProjects = [
-    { id: 1, name: "Project A", admin: "John Doe", address: "789 Maple Rd", status: "Active", linked: true },
-    { id: 2, name: "Project B", admin: "Sarah Smith", address: "101 Pine Ln", status: "Pending", linked: false },
-  ];
-
+  // Fetch user name and projects
   useEffect(() => {
-    const fetchUserName = async () => {
+    const fetchDashboardData = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await fetch("https://snorbackend.onrender.com/api/auth/me", {
+  
+        // Fetch user info
+        const userResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/auth/me`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        const data = await response.json();
-        if (response.ok) {
-          setUserName(data.name);
+        const userData = await userResponse.json();
+        if (userResponse.ok) {
+          setUserName(userData.name);
         } else {
-          console.error(data.message || "Failed to fetch user name.");
+          console.error(userData.message || "Failed to fetch user name.");
         }
+  
+        // Fetch admin projects
+        const projectResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/project/my-projects`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const projectData = await projectResponse.json();
+        if (projectResponse.ok) {
+          setAdminProjects(projectData.projects);
+        } else {
+          console.error("Failed to fetch projects.");
+        }
+  
+        // Fetch all other projects
+        const allProjectsResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/project/all-other-projects`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const allProjectsData = await allProjectsResponse.json();
+        if (allProjectsResponse.ok) {
+          setAllProjects(allProjectsData.projects);
+        } else {
+          console.error("Failed to fetch all projects.");
+        }
+  
+        // Fetch linked projects ✅
+        fetchLinkedProjects();
       } catch (error) {
-        console.error("Error fetching user name:", error);
+        console.error("Error fetching dashboard data:", error);
       }
     };
-
-    fetchUserName();
+  
+    fetchDashboardData();
   }, []);
-
+  
+  const fetchAccessRequests = async (projectId) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}/api/project/${projectId}/requests`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      
+      const data = await response.json();
+  
+      if (response.ok) {
+        setRequests(data.requests); // Store requests in state
+        setActiveDropdown(projectId); // Set the active project for the dropdown
+      } else {
+        console.error(data.message || "Failed to fetch access requests.");
+      }
+    } catch (error) {
+      console.error("Error fetching access requests:", error);
+    }
+  };
+  const fetchLinkedProjects = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}/api/project/linked-projects`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      const data = await response.json();
+  
+      if (response.ok) {
+        setLinkedProjects(data.projects); // ✅ Store linked projects in state
+      } else {
+        console.error(data.message || "Failed to fetch linked projects.");
+      }
+    } catch (error) {
+      console.error("Error fetching linked projects:", error);
+    }
+  };
+  
+  const handleManageRequests = async (projectId) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}/api/project/${projectId}/requests`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      const data = await response.json();
+  
+      if (response.ok) {
+        // Group requests by email
+        const groupedRequests = data.requests.reduce((acc, request) => {
+          const { email, status } = request;
+          if (!acc[email]) {
+            acc[email] = { email, status, count: 1 };
+          } else {
+            acc[email].count += 1;
+          }
+          return acc;
+        }, {});
+  
+        const groupedRequestsArray = Object.values(groupedRequests);
+        setRequests({ [projectId]: groupedRequestsArray }); // Update state with grouped requests
+      } else {
+        console.error("Error fetching requests:", data.message);
+      }
+    } catch (error) {
+      console.error("Error fetching access requests:", error);
+    }
+  };
+  
+  const handleAcceptRequest = async (projectId, requesterEmail) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}/api/project/handle-request`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            projectId,
+            userEmail: requesterEmail,
+            action: "approve",
+          }),
+        }
+      );
+      const data = await response.json();
+  
+      if (response.ok) {
+        alert(`Request from ${requesterEmail} has been accepted.`);
+        handleManageRequests(projectId); // Refresh requests after action
+      } else {
+        console.error("Error accepting request:", data.message);
+      }
+    } catch (error) {
+      console.error("Error accepting request:", error);
+    }
+  };
+  
+  const handleDeleteRequest = async (projectId, requesterEmail) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}/api/project/handle-request`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            projectId,
+            userEmail: requesterEmail,
+            action: "deny",
+          }),
+        }
+      );
+      const data = await response.json();
+  
+      if (response.ok) {
+        alert(`Request from ${requesterEmail} has been deleted.`);
+        handleManageRequests(projectId); // Refresh requests after action
+      } else {
+        console.error("Error deleting request:", data.message);
+      }
+    } catch (error) {
+      console.error("Error deleting request:", error);
+    }
+  };
+  const handleRequestAction = async (projectId, requesterEmail, action) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}/api/project/handle-access-request`, // ✅ Correct API route
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ projectId, userEmail: requesterEmail, action }),
+        }
+      );
+  
+      const data = await response.json();
+      if (response.ok) {
+        alert(`Request ${action}ed successfully.`);
+        fetchAccessRequests(projectId); // ✅ Refresh requests after action
+      } else {
+        console.error(data.message || "Failed to handle request.");
+        alert(data.message || "Failed to handle request.");
+      }
+    } catch (error) {
+      console.error("Error handling request:", error);
+      alert("An error occurred. Please try again.");
+    }
+  };
+  
+  
+  // Filter projects based on search query
   const handleSearch = (event) => {
     const query = event.target.value.toLowerCase();
     setSearchQuery(query);
-
-    setFilteredAdminProjects(
-      adminProjects.filter(
-        (project) =>
-          project.name.toLowerCase().includes(query) ||
-          project.address.toLowerCase().includes(query)
-      )
+  
+    if (query.trim() === "") {
+      setShowDropdown(false);
+      setFilteredProjects([]);
+      return;
+    }
+  
+    const filtered = allProjects.filter(
+      (project) =>
+        project.projectName.toLowerCase().includes(query) ||
+        project.address.toLowerCase().includes(query)
     );
-
-    setFilteredLinkedProjects(
-      linkedProjects.filter(
-        (project) =>
-          project.name.toLowerCase().includes(query) ||
-          project.address.toLowerCase().includes(query)
-      )
-    );
+  
+    setFilteredProjects(filtered);
+    setShowDropdown(true);
   };
+  
 
   const resetSearch = () => {
     setSearchQuery("");
     setFilteredAdminProjects([]);
-    setFilteredLinkedProjects([]);
   };
+  
 
   const openAddressModal = () => {
     setAddressModalOpen(true);
@@ -89,78 +282,140 @@ const UserDashboard = () => {
   };
 
   const displayedAdminProjects = searchQuery ? filteredAdminProjects : adminProjects;
-  const displayedLinkedProjects = searchQuery ? filteredLinkedProjects : linkedProjects;
 
   return (
     <div className="dashboard-container">
-      <header className="navbar">
+      <header className="dashboard-navbar">
         <h1>Snør</h1>
         <button onClick={openAddressModal}>Create Project</button>
         <button onClick={() => console.log("Notifications Clicked")}>Notifications</button>
         <button onClick={() => console.log("Logout Clicked")}>Logout</button>
       </header>
 
-      <div className="search-bar">
+      <div className="dashboard-search-dropdown">
         <input
           type="text"
-          placeholder="Search projects by name or address..."
+          placeholder="Search projects by address..."
           value={searchQuery}
           onChange={handleSearch}
         />
-        {searchQuery && (
-          <button onClick={resetSearch} className="clear-search">
-            Clear
-          </button>
-        )}
+        <div className="dashboard-search-dropdown-list">
+          {filteredProjects.map((project) => (
+            <div
+              key={project._id}
+              className="dashboard-search-dropdown-item"
+              onClick={() => console.log("Selected:", project)}
+            >
+              {project.address}
+              <button 
+                onClick={() => navigate(`/view-project/${project._id}`, { state: { project } })}
+                className="dashboard-request-access-btn"
+              >
+                Request Access
+              </button>
+            </div>
+          ))}
+        </div>
       </div>
 
-      <section className="welcome-section">
+      <section className="dashboard-welcome-section">
         <h2>Welcome, {userName}!</h2>
       </section>
 
       {/* Projects I Administer */}
-      <section className="projects-section">
-        <div className="section-header">
+      <section className="dashboard-projects-section">
+        <div className="dashboard-section-header">
           <h3>Projects I Administer</h3>
           <button
-            className="toggle-button"
-            onClick={() => setShowAdminProjects(!showAdminProjects)}
-          >
-            {showAdminProjects ? "Hide" : "Show"}
-          </button>
+  className="dashboard-hide-btn"
+  onClick={() => setShowAdminProjects(!showAdminProjects)}
+>
+  {showAdminProjects ? "Hide" : "Show"}
+</button>
+
         </div>
         {showAdminProjects && (
-          <table className="projects-table">
+          <table className="dashboard-projects-table">
             <thead>
               <tr>
                 <th>Project Name</th>
                 <th>Address</th>
                 <th>Status</th>
-                <th>Linked</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {displayedAdminProjects.map((project) => (
-                <tr key={project.id}>
-                  <td>{project.name}</td>
+                <tr key={project._id}>
+                  <td>{project.projectName}</td>
                   <td>{project.address}</td>
                   <td>{project.status}</td>
                   <td>
-                    {project.linked ? (
-                      <span className="linked-indicator">Linked</span>
-                    ) : (
-                      <span className="unlinked-indicator">Unlinked</span>
-                    )}
-                  </td>
-                  <td>
-                    <button onClick={() => navigate(`/manage-project/${project.id}`)}>Manage</button>
-                    <button>Add Users</button>
-                    <button className="manage-requests">
-                      <span role="img" aria-label="Link">🔗</span> Manage Requests
-                    </button>
-                    <button className="delete">Delete</button>
-                  </td>
+  <button
+    onClick={() =>
+      navigate(`/manage-project/${project._id}`, { state: { project } })
+    }
+    className="dashboard-manage-btn"
+  >
+    Manage
+  </button>
+  <button className="dashboard-delete-btn">Delete</button>
+  <button
+    className="dashboard-manage-requests-btn"
+    onClick={() =>
+      activeDropdown === project._id
+        ? setActiveDropdown(null) // Close dropdown if already active
+        : fetchAccessRequests(project._id) // Fetch requests if not already active
+    }
+  >
+    Manage Requests
+  </button>
+  {activeDropdown === project._id && (
+    <div className="dashboard-requests-dropdown">
+      {requests.length > 0 ? (
+        // Group requests by unique requester email
+        Object.entries(
+          requests.reduce((acc, request) => {
+            acc[request.requesterEmail] = acc[request.requesterEmail] || [];
+            acc[request.requesterEmail].push(request);
+            return acc;
+          }, {})
+        ).map(([email, userRequests]) => (
+          <div key={email} className="dashboard-request-item">
+            <p>
+              <strong>Requester:</strong> {email}
+            </p>
+            <p>
+              <strong>Requests:</strong> {userRequests.length} request(s)
+            </p>
+            <p>
+              <strong>Status:</strong> {userRequests[0].status}
+            </p>
+            <div className="dashboard-request-actions">
+              <button
+                className="dashboard-accept-btn"
+                onClick={() => handleRequestAction(project._id, email, "approve")}
+              >
+                Accept
+              </button>
+              <button
+                className="dashboard-delete-btn"
+                onClick={() => handleRequestAction(project._id, email, "deny")}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        ))
+      ) : (
+        <p>No requests found.</p>
+      )}
+    </div>
+  )}
+ 
+</td>
+
+
                 </tr>
               ))}
             </tbody>
@@ -169,56 +424,70 @@ const UserDashboard = () => {
       </section>
 
       {/* Linked Projects */}
-      <section className="projects-section">
-        <div className="section-header">
-          <h3>My Linked/Unlinked Projects</h3>
-          <button
-            className="toggle-button"
-            onClick={() => setShowLinkedProjects(!showLinkedProjects)}
-          >
-            {showLinkedProjects ? "Hide" : "Show"}
-          </button>
-        </div>
-        {showLinkedProjects && (
-          <table className="projects-table">
-            <thead>
-              <tr>
-                <th>Project Name</th>
-                <th>Admin</th>
-                <th>Address</th>
-                <th>Status</th>
-                <th>Linked</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {displayedLinkedProjects.map((project) => (
-                <tr key={project.id}>
-                  <td>{project.name}</td>
-                  <td>{project.admin}</td>
-                  <td>{project.address}</td>
-                  <td>{project.status}</td>
-                  <td>
-                    {project.linked ? (
-                      <span className="linked-indicator">Linked</span>
-                    ) : (
-                      <span className="unlinked-indicator">Unlinked</span>
-                    )}
-                  </td>
-                  <td>
-                    <button onClick={() => navigate(`/view-project/${project.id}`)}>View</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+     {/* My Linked Projects Section */}
+<section className="dashboard-projects-section">
+  <div className="dashboard-section-header">
+    <h3>My Linked Projects</h3>
+    <button
+      className="dashboard-hide-btn"
+      onClick={() => setShowLinkedProjects(!showLinkedProjects)}
+    >
+      {showLinkedProjects ? "Hide" : "Show"}
+    </button>
+  </div>
+  
+  {showLinkedProjects && (
+    <table className="dashboard-projects-table">
+      <thead>
+        <tr>
+          <th>Project Name</th>
+          <th>Admin</th>
+          <th>Address</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {linkedProjects.length > 0 ? (
+          linkedProjects.map((project) => (
+            <tr key={project._id}>
+              <td>{project.projectName}</td>
+              <td>{project.admin}</td>
+              <td>{project.address}</td>
+              <td>{project.status}</td>
+              <td>
+                <button
+                  onClick={() => navigate(`/view-project/${project._id}`, { state: { project } })}
+                  className="dashboard-view-btn"
+                >
+                  View
+                </button>
+                <button
+    onClick={() =>
+      navigate(`/manage-project/${project._id}`, { state: { project } })
+    }
+    className="dashboard-manage-btn"
+  >
+    Manage
+  </button>
+              </td>
+            </tr>
+          ))
+        ) : (
+          <tr>
+            <td colSpan="5" className="no-data-message">No linked projects yet.</td>
+          </tr>
         )}
-      </section>
+      </tbody>
+    </table>
+  )}
+</section>
+
 
       {/* Address Modal */}
       {addressModalOpen && (
-        <div className="modal-overlay">
-          <div className="modal-content">
+        <div className="dashboard-modal-overlay">
+          <div className="dashboard-modal-content">
             <h3>Enter Project Address</h3>
             <input
               type="text"
@@ -226,7 +495,7 @@ const UserDashboard = () => {
               value={selectedAddress}
               onChange={(e) => setSelectedAddress(e.target.value)}
             />
-            <div className="modal-actions">
+            <div className="dashboard-modal-actions">
               <button onClick={handleAddressConfirm}>Confirm</button>
               <button onClick={closeAddressModal}>Cancel</button>
             </div>

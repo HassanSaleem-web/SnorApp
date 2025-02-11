@@ -4,6 +4,10 @@ import SignUp from "../pages/SignUpPage"; // Sign-Up page
 import UserDashboard from "../pages/UserDashboard"; // User/Admin Dashboard placeholder
 import ContractorDashboard from "../pages/ContractorDashboard"; // Contractor Dashboard
 import MapComponent from "../components/MapComponent"; // Map Component
+import ManagingComponent from "../components/ManagingComponent";
+import ViewingComponent from "../components/ViewingComponent";
+
+
 
 const AppRoutes = () => {
   return (
@@ -19,6 +23,9 @@ const AppRoutes = () => {
 
       {/* Create Project */}
       <Route path="/create-project" element={<MapComponent />} />
+      <Route path="/manage-project/:id" element={<ManagingComponent />} />
+      <Route path="/view-project/:id" element={<ViewingComponent />} />
+
     </Routes>
   );
 };
