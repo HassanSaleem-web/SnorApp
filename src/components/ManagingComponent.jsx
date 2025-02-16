@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 
 
-import md5 from "md5"; // Hashing library for consistent colors
+
 import { useNavigate, useLocation } from "react-router-dom";
 import {
   GoogleMap,
