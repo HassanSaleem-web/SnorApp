@@ -101,3 +101,31 @@
 .shape-management button:hover {
   background: #c0392b;
 }
+.table-container {
+  max-height: 250px; /* ✅ Limit height to fit 5 rows */
+  overflow-y: auto; /* ✅ Enable vertical scrollbar */
+  border: 1px solid #ccc; /* Optional: Adds a border */
+}
+
+.shape-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.shape-table th, .shape-table td {
+  padding: 10px;
+  text-align: left;
+}
+
+.shape-table th {
+  background-color: #333;
+  color: white;
+}
+
+.shape-table tbody tr:nth-child(odd) {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.shape-table tbody tr:hover {
+  opacity: 0.8; /* ✅ Subtle hover effect */
+}

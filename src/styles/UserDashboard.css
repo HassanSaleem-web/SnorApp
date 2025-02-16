@@ -384,3 +384,117 @@
     opacity: 1;
   }
 }
+/* Container for the dropdown */
+.proposal-dropdown-container {
+  position: relative;
+  display: inline-block;
+}
+
+/* The dropdown itself */
+.proposal-dropdown {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  width: 280px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  padding: 15px;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Each proposal item */
+.proposal-item {
+  padding: 12px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  background: #f9f9f9;
+  border-left: 5px solid #ff9800; /* Orange left border */
+  transition: all 0.3s ease-in-out;
+}
+
+/* Hover effect for proposal items */
+.proposal-item:hover {
+  background: #ffe0b2;
+  transform: scale(1.02);
+}
+
+/* No proposals message */
+.no-proposals {
+  padding: 12px;
+  text-align: center;
+  color: #777;
+  font-style: italic;
+}
+
+/* Proposal button */
+.dashboard-proposal-btn {
+  background: linear-gradient(135deg, #ff9800, #e65100);
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: bold;
+}
+
+/* Hover effect for proposal button */
+.dashboard-proposal-btn:hover {
+  background: linear-gradient(135deg, #e65100, #bf360c);
+  transform: scale(1.05);
+}
+
+/* Styling for proposal text */
+.proposal-item p {
+  margin: 4px 0;
+  font-size: 14px;
+  color: #333;
+}
+
+/* Bold Labels */
+.proposal-item p strong {
+  color: #222;
+  font-weight: 600;
+}
+
+/* Smooth fade-in animation */
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+/* Highlight row when hovering over a related proposal */
+/* Highlight project row when hovered over a related proposal */
+/* 🔥 Make the highlighted row stand out */
+/* 🔥 Ensure the whole row is highlighted */
+.dashboard-projects-table tbody tr.highlighted-row {
+  background-color: #ffcc00 !important; /* Bright yellow background */
+  color: #000 !important; /* Black text for contrast */
+  font-weight: bold;
+  transition: background 0.3s ease-in-out, color 0.3s ease-in-out;
+}
+
+/* 🔥 Ensure all table cells also reflect the highlight */
+.dashboard-projects-table tbody tr.highlighted-row td {
+  background-color: #ffcc00 !important; /* Ensure each cell is covered */
+  color: #000 !important; /* Black text */
+  font-weight: bold;
+}
+
+/* 🔥 Add a slight border glow effect */
+.dashboard-projects-table tbody tr.highlighted-row {
+  background: linear-gradient(135deg, #e65100, #bf360c);
+}
+
+/* 🔥 Smooth transition for better UI feel */
+.dashboard-projects-table tbody tr {
+  transition: all 0.3s ease-in-out;
+}
+

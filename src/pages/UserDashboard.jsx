@@ -18,7 +18,10 @@ const UserDashboard = () => {
   const [selectedAddress, setSelectedAddress] = useState("");
   const [requests, setRequests] = useState([]); // Store fetched requests
   const [activeDropdown, setActiveDropdown] = useState(null); // Track the active dropdown
-  
+  const [proposals, setProposals] = useState([]); // ✅ Store proposals
+  const [showProposalsDropdown, setShowProposalsDropdown] = useState(false); // ✅ Toggle proposals dropdown
+  const [hoveredProjectId, setHoveredProjectId] = useState(null);
+
 
   // Fetch user name and projects
   useEffect(() => {
@@ -65,8 +68,28 @@ const UserDashboard = () => {
         console.error("Error fetching dashboard data:", error);
       }
     };
+    const fetchProposals = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/proposal/admin-proposals`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+    
+        const data = await response.json();
+        if (response.ok) {
+          setProposals(data.proposals);
+          console.log(data.proposals);
+        } else {
+          console.error("Failed to fetch proposals:", data.message);
+        }
+      } catch (error) {
+        console.error("Error fetching proposals:", error);
+      }
+    };
+    
   
     fetchDashboardData();
+    fetchProposals(); // ✅ Fetch proposals on load
   }, []);
   
   const fetchAccessRequests = async (projectId) => {
@@ -110,6 +133,9 @@ const UserDashboard = () => {
     } catch (error) {
       console.error("Error fetching linked projects:", error);
     }
+  };
+  const toggleProposalsDropdown = () => {
+    setShowProposalsDropdown(!showProposalsDropdown);
   };
   
   const handleManageRequests = async (projectId) => {
@@ -288,7 +314,35 @@ const UserDashboard = () => {
       <header className="dashboard-navbar">
         <h1>Snør</h1>
         <button onClick={openAddressModal}>Create Project</button>
-        <button onClick={() => console.log("Notifications Clicked")}>Notifications</button>
+        <div className="proposal-dropdown-container">
+  <button onClick={toggleProposalsDropdown} className="dashboard-proposal-btn">
+    Proposals
+  </button>
+
+  {showProposalsDropdown && (
+
+    <div className="proposal-dropdown">
+      {proposals.length > 0 ? (
+        proposals.map((proposal) => (
+          <div 
+  key={proposal._id} 
+  className="proposal-item"
+  onMouseEnter={() => setHoveredProjectId(proposal.projectId.toString())} 
+  onMouseLeave={() => setHoveredProjectId(null)}
+>
+  <p><strong>Project:</strong> {proposal.projectId}</p>
+  <p><strong>Sender:</strong> {proposal.proposalSender}</p>
+  <p><strong>Price Quoted:</strong> ${proposal.priceQuoted}</p>
+</div>
+
+        ))
+      ) : (
+        <p className="no-proposals">No proposals found.</p>
+      )}
+    </div>
+  )}
+</div>
+
         <button onClick={() => console.log("Logout Clicked")}>Logout</button>
       </header>
 
@@ -335,92 +389,94 @@ const UserDashboard = () => {
 
         </div>
         {showAdminProjects && (
-          <table className="dashboard-projects-table">
-            <thead>
-              <tr>
-                <th>Project Name</th>
-                <th>Address</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {displayedAdminProjects.map((project) => (
-                <tr key={project._id}>
-                  <td>{project.projectName}</td>
-                  <td>{project.address}</td>
-                  <td>{project.status}</td>
-                  <td>
-  <button
-    onClick={() =>
-      navigate(`/manage-project/${project._id}`, { state: { project } })
-    }
-    className="dashboard-manage-btn"
-  >
-    Manage
-  </button>
-  <button className="dashboard-delete-btn">Delete</button>
-  <button
-    className="dashboard-manage-requests-btn"
-    onClick={() =>
-      activeDropdown === project._id
-        ? setActiveDropdown(null) // Close dropdown if already active
-        : fetchAccessRequests(project._id) // Fetch requests if not already active
-    }
-  >
-    Manage Requests
-  </button>
-  {activeDropdown === project._id && (
-    <div className="dashboard-requests-dropdown">
-      {requests.length > 0 ? (
-        // Group requests by unique requester email
-        Object.entries(
-          requests.reduce((acc, request) => {
-            acc[request.requesterEmail] = acc[request.requesterEmail] || [];
-            acc[request.requesterEmail].push(request);
-            return acc;
-          }, {})
-        ).map(([email, userRequests]) => (
-          <div key={email} className="dashboard-request-item">
-            <p>
-              <strong>Requester:</strong> {email}
-            </p>
-            <p>
-              <strong>Requests:</strong> {userRequests.length} request(s)
-            </p>
-            <p>
-              <strong>Status:</strong> {userRequests[0].status}
-            </p>
-            <div className="dashboard-request-actions">
-              <button
-                className="dashboard-accept-btn"
-                onClick={() => handleRequestAction(project._id, email, "approve")}
-              >
-                Accept
-              </button>
-              <button
-                className="dashboard-delete-btn"
-                onClick={() => handleRequestAction(project._id, email, "deny")}
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        ))
-      ) : (
-        <p>No requests found.</p>
-      )}
-    </div>
-  )}
- 
-</td>
+  <table className="dashboard-projects-table">
+    <thead>
+      <tr>
+        <th>Project Name</th>
+        <th>Address</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {displayedAdminProjects.map((project) => (
+        <tr
+          key={project._id}
+          className={hoveredProjectId === project._id.toString() ? "highlighted-row" : ""}
+        >
+          <td>{project.projectName}</td>
+          <td>{project.address}</td>
+          <td>{project.status}</td>
+          <td>
+            <button
+              onClick={() =>
+                navigate(`/manage-project/${project._id}`, { state: { project } })
+              }
+              className="dashboard-manage-btn"
+            >
+              Manage
+            </button>
+            <button className="dashboard-delete-btn">Delete</button>
+            <button
+              className="dashboard-manage-requests-btn"
+              onClick={() =>
+                activeDropdown === project._id
+                  ? setActiveDropdown(null)
+                  : fetchAccessRequests(project._id)
+              }
+            >
+              Manage Requests
+            </button>
 
+            {/* 🔥 Dropdown for Access Requests */}
+            {activeDropdown === project._id && (
+              <div className="dashboard-requests-dropdown">
+                {requests.length > 0 ? (
+                  Object.entries(
+                    requests.reduce((acc, request) => {
+                      acc[request.requesterEmail] = acc[request.requesterEmail] || [];
+                      acc[request.requesterEmail].push(request);
+                      return acc;
+                    }, {})
+                  ).map(([email, userRequests]) => (
+                    <div key={email} className="dashboard-request-item">
+                      <p>
+                        <strong>Requester:</strong> {email}
+                      </p>
+                      <p>
+                        <strong>Requests:</strong> {userRequests.length} request(s)
+                      </p>
+                      <p>
+                        <strong>Status:</strong> {userRequests[0].status}
+                      </p>
+                      <div className="dashboard-request-actions">
+                        <button
+                          className="dashboard-accept-btn"
+                          onClick={() => handleRequestAction(project._id, email, "approve")}
+                        >
+                          Accept
+                        </button>
+                        <button
+                          className="dashboard-delete-btn"
+                          onClick={() => handleRequestAction(project._id, email, "deny")}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p>No requests found.</p>
+                )}
+              </div>
+            )}
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+)}
 
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
       </section>
 
       {/* Linked Projects */}

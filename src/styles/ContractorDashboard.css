@@ -1,202 +1,240 @@
 /* Main Dashboard Container */
 .dashboard-container {
-    padding: 30px;
-    background-color: #f5f7fa; /* Soft background for better contrast */
-    border-radius: 12px;
-    box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.12); /* Subtle shadow for depth */
-    max-width: 1200px;
-    margin: 20px auto;
-    font-family: "Roboto", sans-serif;
+  padding: 30px;
+  background-color: #f5f7fa;
+  border-radius: 12px;
+  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.12);
+  max-width: 1200px;
+  margin: 20px auto;
+  font-family: "Roboto", sans-serif;
+}
+
+/* Navbar Styling */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 24px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.08);
+  margin-bottom: 20px;
+}
+
+.navbar button {
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.navbar button:nth-child(1) {
+  background: linear-gradient(135deg, #2196f3, #1976d2);
+}
+
+.navbar button:nth-child(2) {
+  background: linear-gradient(135deg, #4caf50, #388e3c);
+}
+
+.navbar button:nth-child(3) {
+  background: linear-gradient(135deg, #ff6b6b, #d32f2f);
+}
+
+.navbar button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Projects Section */
+.projects-section {
+  margin-bottom: 30px;
+  padding: 20px;
+  border-radius: 10px;
+  background-color: #ffffff;
+  box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Section Header */
+.projects-section .section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.section-header h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333333;
+  margin: 0;
+  padding-bottom: 5px;
+  border-bottom: 2px solid #dfe3e6;
+}
+
+.section-header .toggle-button {
+  padding: 8px 15px;
+  font-size: 14px;
+  color: #ffffff;
+  border: none;
+  border-radius: 5px;
+  background: linear-gradient(135deg, #607d8b, #455a64);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.section-header .toggle-button:hover {
+  background: linear-gradient(135deg, #455a64, #37474f);
+}
+
+/* Projects Table */
+.projects-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin-top: 10px;
+  overflow-x: auto; /* Allows horizontal scrolling */
+  display: block;
+  max-height: 400px; /* Scrollable table */
+}
+
+.projects-table thead {
+  position: sticky;
+  top: 0;
+  background-color: #f1f3f6;
+  z-index: 2;
+}
+
+/* Table Headers & Cells */
+.projects-table th,
+.projects-table td {
+  text-align: left;
+  padding: 12px 15px;
+  border: 1px solid #e0e4ea;
+}
+
+.projects-table th {
+  background-color: #f1f3f6;
+  color: #333333;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 14px;
+}
+
+.projects-table td {
+  background-color: #ffffff;
+  color: #555555;
+  font-size: 14px;
+}
+
+.projects-table tr:hover {
+  background-color: #eaf4fc;
+  transition: all 0.3s ease;
+}
+
+/* Buttons in Table */
+.projects-table button {
+  padding: 8px 14px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #ffffff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-right: 5px; /* ✅ Adds spacing between buttons */
+}
+
+/* View Button */
+.view-btn {
+  background: #28a745;
+  transition: transform 0.2s ease-in-out;
+}
+
+.view-btn:hover {
+  background: #218838;
+  transform: scale(1.05); /* ✅ Slight scaling effect */
+}
+
+/* Propose Button */
+.propose-btn {
+  background: #007bff;
+  transition: transform 0.2s ease-in-out;
+}
+
+.propose-btn:hover {
+  background: #0056b3;
+  transform: scale(1.05); /* ✅ Slight scaling effect */
+}
+
+/* Disabled Button */
+.projects-table button:disabled {
+  background-color: #cfd8dc;
+  cursor: not-allowed;
+}
+
+/* Scrollbar Styling */
+.projects-table::-webkit-scrollbar {
+  height: 8px;
+}
+
+.projects-table::-webkit-scrollbar-thumb {
+  background: #b0bec5;
+  border-radius: 4px;
+}
+
+.projects-table::-webkit-scrollbar-thumb:hover {
+  background: #90a4ae;
+}
+
+.projects-table::-webkit-scrollbar-track {
+  background: #eceff1;
+}
+
+/* Typography Enhancements */
+h3,
+th,
+td {
+  font-family: "Roboto", sans-serif;
+}
+
+button {
+  font-family: "Roboto", sans-serif;
+}
+
+/* Add Smooth Animation */
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
   }
-  
-  /* Navbar Styling */
-  .navbar {
-    display: flex;
-    justify-content: space-between;
-    padding: 10px 20px;
-    background-color: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.08);
-    margin-bottom: 20px;
+  100% {
+    opacity: 1;
+    transform: translateY(0);
   }
-  
-  .navbar button {
-    padding: 10px 20px;
-    font-size: 14px;
-    font-weight: bold;
-    text-transform: uppercase;
-    color: #ffffff;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-  
-  .navbar button:nth-child(1) {
-    background: linear-gradient(135deg, #2196f3, #1976d2);
-  }
-  
-  .navbar button:nth-child(2) {
-    background: linear-gradient(135deg, #4caf50, #388e3c);
-  }
-  
-  .navbar button:nth-child(3) {
-    background: linear-gradient(135deg, #ff6b6b, #d32f2f);
-  }
-  
-  .navbar button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.15);
-  }
-  
-  /* Projects Section */
+}
+
+.projects-section,
+.navbar button {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
   .projects-section {
-    margin-bottom: 30px;
-    padding: 20px;
-    border-radius: 10px;
-    background-color: #ffffff;
-    box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.1);
-    animation: fadeIn 0.5s ease-in-out;
+    padding: 15px;
   }
-  
-  .projects-section .section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-  }
-  
-  .section-header h3 {
-    font-size: 18px;
-    font-weight: 600;
-    color: #333333;
-    margin: 0;
-    padding-bottom: 5px;
-    border-bottom: 2px solid #dfe3e6;
-  }
-  
-  .section-header .toggle-button {
-    padding: 8px 15px;
-    font-size: 14px;
-    color: #ffffff;
-    border: none;
-    border-radius: 5px;
-    background: linear-gradient(135deg, #607d8b, #455a64);
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-  
-  .section-header .toggle-button:hover {
-    background: linear-gradient(135deg, #455a64, #37474f);
-  }
-  
-  /* Projects Table */
+
   .projects-table {
-    width: 100%;
-    border-collapse: collapse;
-    border-spacing: 0;
-    margin-top: 10px;
+    max-height: 350px;
   }
-  
-  .projects-table th,
-  .projects-table td {
-    text-align: left;
-    padding: 12px 15px;
-    border: 1px solid #e0e4ea;
+
+  .navbar {
+    flex-direction: column;
+    gap: 10px;
   }
-  
-  .projects-table th {
-    background-color: #f1f3f6;
-    color: #333333;
-    font-weight: 600;
-    text-transform: uppercase;
-    font-size: 14px;
-  }
-  
-  .projects-table td {
-    background-color: #ffffff;
-    color: #555555;
-    font-size: 14px;
-  }
-  
-  .projects-table tr:hover {
-    background-color: #eaf4fc;
-    transition: all 0.3s ease;
-  }
-  
-  /* Action Buttons */
-  .projects-table button {
-    padding: 8px 12px;
-    font-size: 14px;
-    font-weight: bold;
-    color: #ffffff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-  
-  .projects-table button:hover {
-    transform: translateY(-2px);
-  }
-  
-  .projects-table button:disabled {
-    background-color: #cfd8dc;
-    color: #ffffff;
-    cursor: not-allowed;
-  }
-  
-  .projects-table button:not(:disabled) {
-    background: linear-gradient(135deg, #4caf50, #388e3c);
-  }
-  
-  .projects-table button:not(:disabled):hover {
-    background: linear-gradient(135deg, #388e3c, #2e7d32);
-  }
-  
-  /* Scrollbar Styling */
-  .projects-table::-webkit-scrollbar {
-    height: 8px;
-  }
-  
-  .projects-table::-webkit-scrollbar-thumb {
-    background: #b0bec5;
-    border-radius: 4px;
-  }
-  
-  .projects-table::-webkit-scrollbar-thumb:hover {
-    background: #90a4ae;
-  }
-  
-  .projects-table::-webkit-scrollbar-track {
-    background: #eceff1;
-  }
-  
-  /* Typography Enhancements */
-  h3,
-  th,
-  td {
-    font-family: "Roboto", sans-serif;
-  }
-  
-  button {
-    font-family: "Roboto", sans-serif;
-  }
-  
-  /* Add Smooth Animation */
-  @keyframes fadeIn {
-    0% {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    100% {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
-  .projects-section,
-  .navbar button {
-    animation: fadeIn 0.5s ease-in-out;
-  }
-  
+}
