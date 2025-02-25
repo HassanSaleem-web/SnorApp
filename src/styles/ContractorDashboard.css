@@ -1,65 +1,68 @@
-/* Main Dashboard Container */
+/* === 🌟 Masterpiece Contractor Dashboard 🌟 === */
 .dashboard-container {
-  padding: 30px;
-  background-color: #f5f7fa;
-  border-radius: 12px;
-  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.12);
+  padding: 25px;
+  background: linear-gradient(135deg, #f3f6fa, #e9eff5);
+  border-radius: 14px;
+  box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.12);
   max-width: 1200px;
-  margin: 20px auto;
-  font-family: "Roboto", sans-serif;
+  margin: 30px auto;
+  font-family: "Poppins", sans-serif;
 }
 
-/* Navbar Styling */
+/* === Navbar Styling: Aesthetic & Functional === */
 .navbar {
   display: flex;
   justify-content: space-between;
-  padding: 12px 24px;
-  background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.08);
+  padding: 14px 26px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  box-shadow: 0px 6px 18px rgba(0, 0, 0, 0.08);
   margin-bottom: 20px;
+  transition: all 0.3s ease-in-out;
 }
 
 .navbar button {
-  padding: 10px 20px;
-  font-size: 14px;
+  padding: 12px 22px;
+  font-size: 15px;
   font-weight: bold;
   text-transform: uppercase;
   color: #ffffff;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s ease-in-out;
 }
 
+/* Navbar Buttons - Soft Elegant Gradients */
 .navbar button:nth-child(1) {
-  background: linear-gradient(135deg, #2196f3, #1976d2);
+  background: linear-gradient(135deg, #007bff, #0056b3);
 }
 
 .navbar button:nth-child(2) {
-  background: linear-gradient(135deg, #4caf50, #388e3c);
+  background: linear-gradient(135deg, #28a745, #1e7e34);
 }
 
 .navbar button:nth-child(3) {
   background: linear-gradient(135deg, #ff6b6b, #d32f2f);
 }
 
+/* Hover Effect */
 .navbar button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-3px);
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.15);
 }
 
-/* Projects Section */
+/* === Projects Section - Premium Look === */
 .projects-section {
-  margin-bottom: 30px;
-  padding: 20px;
-  border-radius: 10px;
-  background-color: #ffffff;
-  box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.1);
-  animation: fadeIn 0.5s ease-in-out;
+  margin-bottom: 25px;
+  padding: 22px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 0.6s ease-in-out;
 }
 
-/* Section Header */
+/* === Section Header - Subtle & Professional === */
 .projects-section .section-header {
   display: flex;
   justify-content: space-between;
@@ -68,44 +71,46 @@
 }
 
 .section-header h3 {
-  font-size: 18px;
-  font-weight: 600;
-  color: #333333;
+  font-size: 20px;
+  font-weight: 700;
+  color: #2c3e50;
   margin: 0;
   padding-bottom: 5px;
-  border-bottom: 2px solid #dfe3e6;
+  border-bottom: 3px solid #3c91e6;
 }
 
+/* Toggle Button - Soft Feel */
 .section-header .toggle-button {
-  padding: 8px 15px;
+  padding: 10px 16px;
   font-size: 14px;
   color: #ffffff;
   border: none;
-  border-radius: 5px;
-  background: linear-gradient(135deg, #607d8b, #455a64);
+  border-radius: 6px;
+  background: linear-gradient(135deg, #34495e, #2c3e50);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s ease-in-out;
 }
 
 .section-header .toggle-button:hover {
-  background: linear-gradient(135deg, #455a64, #37474f);
+  background: linear-gradient(135deg, #2c3e50, #1a252f);
 }
 
-/* Projects Table */
+/* === Projects Table - Modern & Clean === */
 .projects-table {
   width: 100%;
   border-collapse: collapse;
   border-spacing: 0;
   margin-top: 10px;
-  overflow-x: auto; /* Allows horizontal scrolling */
+  overflow-x: auto;
   display: block;
-  max-height: 400px; /* Scrollable table */
+  max-height: 450px;
+  border-radius: 12px;
 }
 
 .projects-table thead {
   position: sticky;
   top: 0;
-  background-color: #f1f3f6;
+  background: #f8fafc;
   z-index: 2;
 }
 
@@ -113,100 +118,82 @@
 .projects-table th,
 .projects-table td {
   text-align: left;
-  padding: 12px 15px;
-  border: 1px solid #e0e4ea;
+  padding: 14px 18px;
+  border-bottom: 1px solid #e3e6ea;
 }
 
 .projects-table th {
-  background-color: #f1f3f6;
+  background: #f1f3f6;
   color: #333333;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
-  font-size: 14px;
+  font-size: 15px;
 }
 
 .projects-table td {
-  background-color: #ffffff;
+  background: #ffffff;
   color: #555555;
   font-size: 14px;
 }
 
+/* Hover Effect - Soft Highlight */
 .projects-table tr:hover {
-  background-color: #eaf4fc;
-  transition: all 0.3s ease;
+  background: rgba(46, 204, 113, 0.1);
+  transition: all 0.3s ease-in-out;
 }
 
-/* Buttons in Table */
+/* === Buttons in Table - Sharp & Dynamic === */
 .projects-table button {
-  padding: 8px 14px;
+  padding: 9px 16px;
   font-size: 14px;
   font-weight: bold;
   color: #ffffff;
   border: none;
-  border-radius: 5px;
+  border-radius: 6px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  margin-right: 5px; /* ✅ Adds spacing between buttons */
+  transition: all 0.3s ease-in-out;
+  margin-right: 6px;
 }
 
 /* View Button */
 .view-btn {
-  background: #28a745;
-  transition: transform 0.2s ease-in-out;
+  background: linear-gradient(135deg, #17a2b8, #138496);
 }
 
 .view-btn:hover {
-  background: #218838;
-  transform: scale(1.05); /* ✅ Slight scaling effect */
+  background: linear-gradient(135deg, #138496, #117a8b);
 }
 
 /* Propose Button */
 .propose-btn {
-  background: #007bff;
-  transition: transform 0.2s ease-in-out;
+  background: linear-gradient(135deg, #e67e22, #d35400);
 }
 
 .propose-btn:hover {
-  background: #0056b3;
-  transform: scale(1.05); /* ✅ Slight scaling effect */
+  background: linear-gradient(135deg, #d35400, #b84300);
 }
 
 /* Disabled Button */
 .projects-table button:disabled {
-  background-color: #cfd8dc;
+  background: #cfd8dc;
   cursor: not-allowed;
 }
 
-/* Scrollbar Styling */
+/* === Scrollbar - Minimal & Classy === */
 .projects-table::-webkit-scrollbar {
   height: 8px;
 }
 
 .projects-table::-webkit-scrollbar-thumb {
-  background: #b0bec5;
+  background: linear-gradient(135deg, #3c91e6, #2b6bb3);
   border-radius: 4px;
-}
-
-.projects-table::-webkit-scrollbar-thumb:hover {
-  background: #90a4ae;
 }
 
 .projects-table::-webkit-scrollbar-track {
   background: #eceff1;
 }
 
-/* Typography Enhancements */
-h3,
-th,
-td {
-  font-family: "Roboto", sans-serif;
-}
-
-button {
-  font-family: "Roboto", sans-serif;
-}
-
-/* Add Smooth Animation */
+/* === Subtle Fade-In Animation === */
 @keyframes fadeIn {
   0% {
     opacity: 0;
@@ -220,13 +207,13 @@ button {
 
 .projects-section,
 .navbar button {
-  animation: fadeIn 0.5s ease-in-out;
+  animation: fadeIn 0.6s ease-in-out;
 }
 
-/* Responsive Design */
+/* === Responsive Design - Seamless on All Devices === */
 @media (max-width: 768px) {
   .projects-section {
-    padding: 15px;
+    padding: 18px;
   }
 
   .projects-table {
@@ -235,6 +222,176 @@ button {
 
   .navbar {
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
+  }
+}
+
+
+/* ===== Modal Styling (Inspired by Your Screenshot) ===== */
+/* === 🌟 The Ultimate Modal Styling 🌟 === */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4); /* Subtle fade effect */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(8px); /* Soft blur for elegance */
+  z-index: 999;
+}
+
+.modal-content {
+  background: rgba(255, 255, 255, 0.85); /* Glassmorphism effect */
+  box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.2);
+  border-radius: 16px;
+  padding: 20px;
+  max-width: 750px;
+  max-height: 80vh; /* Never exceeds 80% screen height */
+  overflow-y: auto;
+  backdrop-filter: blur(12px); /* Soft frosted glass effect */
+  animation: fadeIn 0.4s ease-in-out;
+  transition: all 0.3s ease-in-out;
+}
+
+/* === Scrollbar (Minimalist & Premium) === */
+.modal-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #9de69d, #42b883);
+  border-radius: 4px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* === ✨ Project Details (Elegant & Minimal) === */
+.modal-details {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  padding: 12px;
+  background: rgba(240, 248, 255, 0.8);
+  border-radius: 12px;
+  box-shadow: inset 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.modal-details p {
+  font-size: 14px;
+  font-weight: 600;
+  background: #e8f5e9;
+  padding: 6px 12px;
+  border-radius: 15px;
+  color: #2c7c3f;
+}
+
+/* === 💎 Shape Sections (Glassmorphism with Depth) === */
+.shape-section {
+  background: rgba(255, 255, 255, 0.75);
+  padding: 10px;
+  border-radius: 12px;
+  margin-bottom: 10px;
+  backdrop-filter: blur(8px);
+  box-shadow: inset 0px 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* === 🎨 Input Fields: True Elegance === */
+.shape-price-input {
+  display: flex;
+  align-items: center;
+  background: white;
+  border-radius: 10px;
+  padding: 6px 12px;
+  border: 2px solid rgba(66, 184, 131, 0.5);
+  box-shadow: inset 0px 3px 5px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease-in-out;
+}
+
+.shape-price-input:hover {
+  border-color: #42b883;
+}
+
+.shape-price-input label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #2c7c3f;
+  background: #c5e8ca;
+  padding: 6px 12px;
+  border-radius: 15px;
+  min-width: 150px;
+  text-align: center;
+}
+
+.shape-price-input input {
+  flex: 1;
+  padding: 6px;
+  border: none;
+  font-size: 14px;
+  background: transparent;
+  outline: none;
+}
+
+/* === 💰 Total Price (Premium Badge) === */
+.total-price {
+  background: linear-gradient(135deg, #2c7c3f, #239d52);
+  color: white;
+  padding: 12px;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  border-radius: 12px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+  margin-top: 10px;
+}
+
+/* === ✨ Buttons (Soft & Responsive) === */
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 12px;
+}
+
+.submit-btn,
+.cancel-btn {
+  font-size: 14px;
+  font-weight: 600;
+  padding: 10px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s ease-in-out;
+}
+
+.submit-btn {
+  background: linear-gradient(135deg, #2c7c3f, #239d52);
+  color: white;
+}
+
+.submit-btn:hover {
+  background: linear-gradient(135deg, #239d52, #1a6c38);
+}
+
+.cancel-btn {
+  background: linear-gradient(135deg, #d9534f, #c9302c);
+  color: white;
+}
+
+.cancel-btn:hover {
+  background: linear-gradient(135deg, #c9302c, #a52a2a);
+}
+
+/* === 🎬 Smooth Fade-In Animation === */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

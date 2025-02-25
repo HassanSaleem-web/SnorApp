@@ -21,6 +21,9 @@ const ContractorDashboard = () => {
 
   // ✅ Fetch Current User Email
   const currentUserEmail = JSON.parse(localStorage.getItem("user"))?.email || "unknown";
+// Store pricing for individual polygons and polylines
+const [polygonPrices, setPolygonPrices] = useState({});
+const [polylinePrices, setPolylinePrices] = useState({});
 
   // ✅ Fetch Projects
   useEffect(() => {
@@ -70,19 +73,42 @@ const ContractorDashboard = () => {
     setSelectedProject(null);
     setProposedPrice("");
   };
-
+  const handlePolygonPriceChange = (index, value) => {
+    setPolygonPrices((prev) => ({ ...prev, [index]: value }));
+  };
+  
+  const handlePolylinePriceChange = (index, value) => {
+    setPolylinePrices((prev) => ({ ...prev, [index]: value }));
+  };
+  
+  // Calculate total price dynamically
+  const calculateTotalPrice = () => {
+    const polygonTotal = Object.values(polygonPrices).reduce((sum, price) => sum + (parseFloat(price) || 0), 0);
+    const polylineTotal = Object.values(polylinePrices).reduce((sum, price) => sum + (parseFloat(price) || 0), 0);
+    return polygonTotal + polylineTotal;
+  };
+  
   // ✅ Submit Proposal
  const submitProposal = async () => {
-  if (!proposedPrice || isNaN(proposedPrice) || proposedPrice <= 0) {
-    alert("Please enter a valid price.");
-    return;
-  }
+  const totalPrice = calculateTotalPrice(); // ✅ Get total from shape prices
+
+if (!totalPrice || isNaN(totalPrice) || totalPrice <= 0) {
+  alert("Please enter a valid total price.");
+  return;
+}
+
 
   try {
     setLoading(true);
     const token = localStorage.getItem("token");
     const user = JSON.parse(localStorage.getItem("user")); // ✅ Get user details
-
+    console.log("🔍 Debugging Proposal Data:", {
+      senderEmail: user?.email,
+      projectId: selectedProject?._id,
+      projectAdmin: selectedProject?.admin,
+      priceQuoted: totalPrice,
+    });
+    
     // ✅ Ensure all fields exist
     if (!user?.email || !selectedProject?._id || !selectedProject?.admin) {
       alert("All fields are required.");
@@ -95,7 +121,7 @@ const ContractorDashboard = () => {
       proposalSender: user?.email, // ✅ Contractor Email
       projectId: selectedProject?._id, // ✅ Project ID
       projectAdmin: selectedProject?.admin, // ✅ Project Admin Email
-      priceQuoted: proposedPrice, // ✅ Price Offered
+      priceQuoted: calculateTotalPrice(), // ✅ Price Offered
     });
 
     const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/proposal/submit`, {
@@ -108,7 +134,7 @@ const ContractorDashboard = () => {
         senderEmail: user?.email, // ✅ Contractor Email
         projectId: selectedProject?._id, // ✅ Project ID
         adminEmail: selectedProject?.admin, // ✅ Project Admin Email
-        priceQuoted: proposedPrice, // ✅ Price Offered
+        priceQuoted:calculateTotalPrice() , // ✅ Price Offered
       }),
     });
 
@@ -136,7 +162,14 @@ const ContractorDashboard = () => {
       <header className="navbar">
         <button onClick={() => setShowAvailableProjects(true)}>Available Projects</button>
         <button onClick={() => setShowAssignedProjects(true)}>Assigned Projects</button>
-        <button onClick={() => console.log("Logout Clicked")}>Logout</button>
+        <button
+  onClick={() => {
+    localStorage.removeItem("token"); // ✅ Remove token
+    navigate("/"); // ✅ Redirect to homepage or login
+  }}
+>
+  Logout
+</button>
       </header>
 
       {/* Available Projects Section */}
@@ -221,30 +254,69 @@ const ContractorDashboard = () => {
 
       {/* 🔹 Proposal Pop-up Modal */}
       {showModal && selectedProject && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h2>Propose for {selectedProject.projectName}</h2>
-            <p><strong>Description:</strong> {selectedProject.description}</p>
-            <p><strong>Total Area:</strong> {selectedProject.totalArea?.toFixed(2)} m²</p>
-            <p><strong>Total Length:</strong> {selectedProject.totalLength?.toFixed(2)} m</p>
-            
-            {/* Proposal Input */}
-            <label>Enter Your Proposed Price ($):</label>
-            <input
-              type="number"
-              value={proposedPrice}
-              onChange={(e) => setProposedPrice(e.target.value)}
-              placeholder="Enter price"
-            />
-
-            <div className="modal-actions">
-              <button className="submit-btn" onClick={submitProposal} disabled={loading}>
-                {loading ? "Submitting..." : "Submit"}
-              </button>
-              <button className="cancel-btn" onClick={closeProposalModal} disabled={loading}>Cancel</button>
-            </div>
-          </div>
-        </div>
+       <div className="modal-overlay">
+       <div className="modal-content">
+         {/* ✅ Project Details Section */}
+         <div className="modal-details">
+           <h2>Propose for {selectedProject.projectName}</h2>
+           <p><strong>Description:</strong> {selectedProject.description}</p>
+           <p><strong>Total Area:</strong> {selectedProject.totalArea?.toFixed(2)} m²</p>
+           <p><strong>Total Length:</strong> {selectedProject.totalLength?.toFixed(2)} m</p>
+         </div>
+     
+         {/* ✅ Polygons Pricing Section */}
+         {selectedProject?.polygons?.length > 0 && (
+           <div className="shape-section">
+             <h4>Polygon Pricing:</h4>
+             {selectedProject.polygons.map((polygon, index) => (
+               <div key={index} className="shape-price-input">
+                 <label>Polygon {index + 1} (Area: {polygon.area.toFixed(2)} m²) ($):</label>
+                 <input
+                   type="number"
+                   value={polygonPrices[index] || ""}
+                   onChange={(e) => handlePolygonPriceChange(index, e.target.value)}
+                   placeholder="Enter price"
+                 />
+               </div>
+             ))}
+           </div>
+         )}
+     
+         {/* ✅ Polylines Pricing Section */}
+         {selectedProject?.polylines?.length > 0 && (
+           <div className="shape-section">
+             <h4>Polyline Pricing:</h4>
+             {selectedProject.polylines.map((polyline, index) => (
+               <div key={index} className="shape-price-input">
+                 <label>Polyline {index + 1} (Length: {polyline.length.toFixed(2)} m) ($):</label>
+                 <input
+                   type="number"
+                   value={polylinePrices[index] || ""}
+                   onChange={(e) => handlePolylinePriceChange(index, e.target.value)}
+                   placeholder="Enter price"
+                 />
+               </div>
+             ))}
+           </div>
+         )}
+     
+         {/* ✅ Total Price Section */}
+         <div className="total-price">
+           <p><strong>Total Proposed Price:</strong> ${calculateTotalPrice()}</p>
+         </div>
+     
+         {/* ✅ Buttons Section */}
+         <div className="modal-actions">
+           <button className="submit-btn" onClick={submitProposal} disabled={loading}>
+             {loading ? "Submitting..." : "Submit"}
+           </button>
+           <button className="cancel-btn" onClick={closeProposalModal} disabled={loading}>
+             Cancel
+           </button>
+         </div>
+       </div>
+     </div>
+     
       )}
     </div>
   );

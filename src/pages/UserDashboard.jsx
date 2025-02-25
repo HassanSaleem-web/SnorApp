@@ -14,8 +14,7 @@ const UserDashboard = () => {
   const [filteredAdminProjects, setFilteredAdminProjects] = useState([]);
   const [showAdminProjects, setShowAdminProjects] = useState(true);
   const [showLinkedProjects, setShowLinkedProjects] = useState(true);
-  const [addressModalOpen, setAddressModalOpen] = useState(false);
-  const [selectedAddress, setSelectedAddress] = useState("");
+ 
   const [requests, setRequests] = useState([]); // Store fetched requests
   const [activeDropdown, setActiveDropdown] = useState(null); // Track the active dropdown
   const [proposals, setProposals] = useState([]); // ✅ Store proposals
@@ -36,7 +35,10 @@ const UserDashboard = () => {
         const userData = await userResponse.json();
         if (userResponse.ok) {
           setUserName(userData.name);
-        } else {
+          localStorage.setItem("userAddress", userData.address); // ✅ Store address in localStorage
+          console.log("The address", userData.address)
+        }
+        else {
           console.error(userData.message || "Failed to fetch user name.");
         }
   
@@ -52,18 +54,18 @@ const UserDashboard = () => {
         }
   
         // Fetch all other projects
-        const allProjectsResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/project/all-other-projects`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const allProjectsData = await allProjectsResponse.json();
-        if (allProjectsResponse.ok) {
-          setAllProjects(allProjectsData.projects);
-        } else {
-          console.error("Failed to fetch all projects.");
-        }
+        // const allProjectsResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/project/all-other-projects`, {
+        //   headers: { Authorization: `Bearer ${token}` },
+        // });
+        // const allProjectsData = await allProjectsResponse.json();
+        // if (allProjectsResponse.ok) {
+        //   setAllProjects(allProjectsData.projects);
+        // } else {
+        //   console.error("Failed to fetch all projects.");
+        // }
   
-        // Fetch linked projects ✅
-        fetchLinkedProjects();
+        // // Fetch linked projects ✅
+        // fetchLinkedProjects();
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
       }
@@ -290,30 +292,28 @@ const UserDashboard = () => {
   };
   
 
-  const openAddressModal = () => {
-    setAddressModalOpen(true);
-  };
+ 
 
-  const closeAddressModal = () => {
-    setAddressModalOpen(false);
-  };
-
-  const handleAddressConfirm = () => {
-    if (selectedAddress.trim()) {
-      navigate("/create-project", { state: { address: selectedAddress } });
-    } else {
-      alert("Please enter a valid address.");
-    }
-    closeAddressModal();
-  };
-
+ 
   const displayedAdminProjects = searchQuery ? filteredAdminProjects : adminProjects;
 
   return (
     <div className="dashboard-container">
       <header className="dashboard-navbar">
         <h1>Snør</h1>
-        <button onClick={openAddressModal}>Create Project</button>
+        <button
+  onClick={() => {
+    const userAddress = localStorage.getItem("userAddress"); // ✅ Get stored address
+    if (userAddress) {
+      navigate("/create-project", { state: { address: userAddress } });
+    } else {
+      alert("No address found. Please update your profile.");
+    }
+  }}
+>
+  Create Project
+</button>
+
         <div className="proposal-dropdown-container">
   <button onClick={toggleProposalsDropdown} className="dashboard-proposal-btn">
     Proposals
@@ -343,7 +343,14 @@ const UserDashboard = () => {
   )}
 </div>
 
-        <button onClick={() => console.log("Logout Clicked")}>Logout</button>
+<button
+  onClick={() => {
+    localStorage.removeItem("token"); // ✅ Remove token
+    navigate("/"); // ✅ Redirect to homepage or login
+  }}
+>
+  Logout
+</button>
       </header>
 
       <div className="dashboard-search-dropdown">
@@ -481,83 +488,11 @@ const UserDashboard = () => {
 
       {/* Linked Projects */}
      {/* My Linked Projects Section */}
-<section className="dashboard-projects-section">
-  <div className="dashboard-section-header">
-    <h3>My Linked Projects</h3>
-    <button
-      className="dashboard-hide-btn"
-      onClick={() => setShowLinkedProjects(!showLinkedProjects)}
-    >
-      {showLinkedProjects ? "Hide" : "Show"}
-    </button>
-  </div>
-  
-  {showLinkedProjects && (
-    <table className="dashboard-projects-table">
-      <thead>
-        <tr>
-          <th>Project Name</th>
-          <th>Admin</th>
-          <th>Address</th>
-          <th>Status</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {linkedProjects.length > 0 ? (
-          linkedProjects.map((project) => (
-            <tr key={project._id}>
-              <td>{project.projectName}</td>
-              <td>{project.admin}</td>
-              <td>{project.address}</td>
-              <td>{project.status}</td>
-              <td>
-                <button
-                  onClick={() => navigate(`/view-project/${project._id}`, { state: { project } })}
-                  className="dashboard-view-btn"
-                >
-                  View
-                </button>
-                <button
-    onClick={() =>
-      navigate(`/manage-project/${project._id}`, { state: { project } })
-    }
-    className="dashboard-manage-btn"
-  >
-    Manage
-  </button>
-              </td>
-            </tr>
-          ))
-        ) : (
-          <tr>
-            <td colSpan="5" className="no-data-message">No linked projects yet.</td>
-          </tr>
-        )}
-      </tbody>
-    </table>
-  )}
-</section>
+
 
 
       {/* Address Modal */}
-      {addressModalOpen && (
-        <div className="dashboard-modal-overlay">
-          <div className="dashboard-modal-content">
-            <h3>Enter Project Address</h3>
-            <input
-              type="text"
-              placeholder="Enter address..."
-              value={selectedAddress}
-              onChange={(e) => setSelectedAddress(e.target.value)}
-            />
-            <div className="dashboard-modal-actions">
-              <button onClick={handleAddressConfirm}>Confirm</button>
-              <button onClick={closeAddressModal}>Cancel</button>
-            </div>
-          </div>
-        </div>
-      )}
+     
     </div>
   );
 };
