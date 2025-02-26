@@ -387,31 +387,7 @@ const UserDashboard = () => {
 </button>
       </header>
 
-      <div className="dashboard-search-dropdown">
-        <input
-          type="text"
-          placeholder="Search projects by address..."
-          value={searchQuery}
-          onChange={handleSearch}
-        />
-        <div className="dashboard-search-dropdown-list">
-          {filteredProjects.map((project) => (
-            <div
-              key={project._id}
-              className="dashboard-search-dropdown-item"
-              onClick={() => console.log("Selected:", project)}
-            >
-              {project.address}
-              <button 
-                onClick={() => navigate(`/view-project/${project._id}`, { state: { project } })}
-                className="dashboard-request-access-btn"
-              >
-                Request Access
-              </button>
-            </div>
-          ))}
-        </div>
-      </div>
+     
 
       <section className="dashboard-welcome-section">
         <h2>Welcome, {userName}!</h2>
@@ -420,7 +396,7 @@ const UserDashboard = () => {
       {/* Projects I Administer */}
       <section className="dashboard-projects-section">
         <div className="dashboard-section-header">
-          <h3>Projects I Administer</h3>
+          <h3>My Projects</h3>
           <button
   className="dashboard-hide-btn"
   onClick={() => setShowAdminProjects(!showAdminProjects)}

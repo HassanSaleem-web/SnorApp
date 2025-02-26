@@ -22,7 +22,7 @@ const MapComponent = () => {
   const [savedShapes, setSavedShapes] = useState([]); // Stores saved shapes
   const [showShapesList, setShowShapesList] = useState(false);
   const [hoveredAddress, setHoveredAddress] = useState(null);
-  const [canDraw, setCanDraw] = useState(true); // 🔥 Controls shape drawing
+  //const [canDraw, setCanDraw] = useState(true); // 🔥 Controls shape drawing
   const [contextMenu, setContextMenu] = useState(null);
 
   const [area, setArea] = useState(0);
@@ -144,8 +144,8 @@ const MapComponent = () => {
   };
 
   const onOverlayComplete = ($overlayEvent) => {
-    // 🚫 Prevent drawing if a shape already exists
-    if (!canDraw) {
+    // 🚨 Prevent drawing if there are existing shapes
+    if (polygons.length > 0 || polylines.length > 0) {
       alert("Please clear the map before drawing a new shape.");
       $overlayEvent.overlay.setMap(null); // Remove newly drawn shape
       return;
@@ -161,7 +161,6 @@ const MapComponent = () => {
   
       overlay.setMap(null);
       setPolygons([newPolygon]);
-      setCanDraw(false); // 🚫 Disable further drawing
       fetchNearbyHomes(newPolygon);
     }
   
@@ -173,7 +172,6 @@ const MapComponent = () => {
   
       overlay.setMap(null);
       setPolylines([newPolyline]);
-      setCanDraw(false); // 🚫 Disable further drawing
       fetchNearbyHomes(newPolyline);
     }
   };
@@ -228,7 +226,7 @@ const MapComponent = () => {
     setHomes([]); // Clear fetched addresses
     setArea(0);
     setPolylineLength(0);
-    setCanDraw(true); // ✅ Allow new shape drawing
+    //setCanDraw(true); // ✅ Allow new shape drawing
   
     // ✅ Ensure state update by forcing a new reference
     setPolygons([...[]]);
@@ -273,6 +271,7 @@ console.log("Polygons after clear:", polygons);
           }
         }
       }
+
       return points;
     };
   
@@ -306,8 +305,10 @@ console.log("Polygons after clear:", polygons);
     }
   
     setHomes(foundHomes);
-    setIsFetchingAddresses(false); // ✅ Hide Loading Animation
+    setIsFetchingAddresses(false);
+    //setCanDraw(false); // ✅ Hide Loading Animation
     console.log("Final Homes inside Polygon using Geocoding:", foundHomes);
+    //console.log("CanDraw here:", canDraw);
   };
   
   
