@@ -146,7 +146,7 @@ const MapComponent = () => {
   const onOverlayComplete = ($overlayEvent) => {
     // 🚨 Prevent drawing if there are existing shapes
     if (polygons.length > 0 || polylines.length > 0) {
-      alert("Please clear the map before drawing a new shape.");
+      alert("Please save the current shape before saving new one, or you will lose your progress.");
       $overlayEvent.overlay.setMap(null); // Remove newly drawn shape
       return;
     }
