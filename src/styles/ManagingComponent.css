@@ -131,13 +131,19 @@ body {
   padding: 15px;
   cursor: pointer;
   transition: all 0.3s ease-in-out;
+  overflow-y: auto;
 }
 
 .map-shape-item-unique:hover {
+  background: red !important;
   transform: scale(1.05);
   box-shadow: 0px 0px 15px rgba(0, 255, 255, 0.3);
 }
-
+.map-shape-item-unique.selected {
+  background: rgba(0, 200, 0, 0.9); /* Change background color when selected */
+  box-shadow: 0px 0px 15px rgba(0, 255, 0, 0.6);
+  color: rgb(242, 11, 11);
+}
 /* 📌 TOGGLE BUTTON FOR SHAPES LIST */
 .map-toggle-shapes-btn-unique {
   background: linear-gradient(45deg, #0057D9, #00D4FF);

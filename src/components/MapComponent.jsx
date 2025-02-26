@@ -351,7 +351,7 @@ console.log("Polygons after clear:", polygons);
   
     setSavedShapes((prevShapes) => [...prevShapes, newShape]);
     setHomes([]); // ✅ Reset addresses but keep shape on map
-  
+    clearMap();
     alert(`${shapeType} saved successfully!`);
   };
   

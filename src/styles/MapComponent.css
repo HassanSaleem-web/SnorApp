@@ -237,18 +237,49 @@
 }
 
 /* 🟢 Individual Shape Item (Glass Look) */
-.map-shape-item-unique {
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(15px);
-  margin-bottom: 12px;
-  padding: 14px;
+.map-shapes-list-container-unique {
+  background:   #ffffff; /* Deep black glass effect */
+  color: #e0e0e0; /* Light gray text for readability */
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  transition: all 0.3s ease-in-out;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
 }
+
+/* Individual Shape Items */
+.map-shape-item-unique {
+  background:  #e0e0e0; /* Dark gray glass effect */
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.2);
+  color: #080000; /* Readable text */
+}
+
+/* 🔥 Hover Effect */
+.map-shape-item-unique:hover {
+  background:  #90caf9; /* Slightly lighter */
+  transform: scale(1.04);
+  box-shadow: 0px 0px 15px rgba(0, 200, 255, 0.4); /* Neon blue glow */
+}
+
+/* 🔥 Selected Shape - Modern Glow Effect */
+.map-shape-item-unique.selected {
+  background: #90caf9; /* Electric blue highlight */
+  color: #080000; /* Ensure text remains readable */
+  border: 1px solid rgba(0, 255, 255, 0.5);
+  box-shadow: 0px 0px 18px rgba(0, 255, 255, 0.7);
+}
+
+/* Selected Shape Hover */
+.map-shape-item-unique.selected:hover {
+  background: #90caf9;
+  transform: scale(1.06);
+  box-shadow: 0px 0px 20px rgba(0, 255, 255, 0.9);
+}
+
 
 /* 🌐 Shape Header (Title & Buttons) */
 .map-shape-header-unique {

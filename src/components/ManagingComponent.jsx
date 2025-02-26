@@ -270,14 +270,10 @@ const ManagingComponent = () => {
   };
 
   const drawingManagerOptions = {
-    drawingControl: true,
+    drawingControl: false,
     drawingControlOptions: {
       position: window.google?.maps?.ControlPosition?.TOP_CENTER,
-      drawingModes: [
-        window.google?.maps?.drawing?.OverlayType?.POLYGON,
-        window.google?.maps?.drawing?.OverlayType?.POLYLINE,
-       
-      ],
+      
     },
   };
   
@@ -312,6 +308,7 @@ const ManagingComponent = () => {
   
   const onLoadMap = (map) => {
     mapRef.current = map;
+    
   };
 
   const onLoadPolygon = (polygon, index) => {
@@ -792,11 +789,13 @@ console.log("Polygons after clear:", polygons);
             onLoad={onLoadMap}
             mapContainerStyle={containerStyle}
             mapTypeId="satellite"
+            
           >
             <DrawingManager
-              onOverlayComplete={onOverlayComplete}
-              options={drawingManagerOptions}
-            />
+  onOverlayComplete={onOverlayComplete}
+  options={drawingManagerOptions}
+/>
+
             {markerPosition && <Marker position={markerPosition} />}
            {/* Render saved shapes from the database */}
            {savedShapes.map((shape, index) =>
@@ -936,7 +935,8 @@ console.log("Polygons after clear:", polygons);
         return (
           <div 
             key={shape.id} 
-            className="map-shape-item-unique"
+            
+            className={`map-shape-item-unique ${selectedShapeIndex === index ? "selected" : ""}`}
             onClick={() => {
               setSelectedShapeIndex(index);
               setSelectedShapeAddresses(shape.addresses);

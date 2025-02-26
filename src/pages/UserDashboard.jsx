@@ -291,7 +291,41 @@ const UserDashboard = () => {
     setFilteredAdminProjects([]);
   };
   
-
+  const handleDeleteProject = async (projectId) => {
+    if (!window.confirm("Are you sure you want to delete this project? This action cannot be undone.")) {
+      return;
+    }
+  
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("User not authenticated. Please log in.");
+        return;
+      }
+  
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/project/${projectId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
+      const data = await response.json();
+  
+      if (response.ok) {
+        alert("Project deleted successfully!");
+  
+        // ✅ Remove project from state
+        setAdminProjects((prevProjects) => prevProjects.filter((project) => project._id !== projectId));
+      } else {
+        alert(data.message || "Failed to delete project.");
+      }
+    } catch (error) {
+      console.error("Error deleting project:", error);
+      alert("An error occurred while deleting the project.");
+    }
+  };
+  
  
 
  
@@ -423,7 +457,8 @@ const UserDashboard = () => {
             >
               Manage
             </button>
-            <button className="dashboard-delete-btn">Delete</button>
+            <button className="dashboard-delete-btn"
+            onClick={() => handleDeleteProject(project._id)}>Delete</button>
             <button
               className="dashboard-manage-requests-btn"
               onClick={() =>
