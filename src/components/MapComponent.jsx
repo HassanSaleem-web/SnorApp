@@ -18,12 +18,15 @@ const MapComponent = () => {
   const polylineRefs = useRef([]);
   const [polygons, setPolygons] = useState([]);
   const [polylines, setPolylines] = useState([]);
-  const [homes, setHomes] = useState([]); // ✅ Store homes found inside shapes
+  const [homes, setHomes] = useState([]); // Stores addresses for multiple shapes
+// ✅ Store homes found inside shapes
   const [savedShapes, setSavedShapes] = useState([]); // Stores saved shapes
   const [showShapesList, setShowShapesList] = useState(false);
-  const [hoveredAddress, setHoveredAddress] = useState(null);
+  const [selectedShapeId, setSelectedShapeId] = useState(null);
   //const [canDraw, setCanDraw] = useState(true); // 🔥 Controls shape drawing
   const [contextMenu, setContextMenu] = useState(null);
+  const [activeMarkers, setActiveMarkers] = useState([]); // ✅ Stores markers for selected shape
+ const [hoveredAddress, setHoveredAddress] = useState(null); // ✅ Tracks which marker is highlighted
 
   const [area, setArea] = useState(0);
   const [polylineLength, setPolylineLength] = useState(0);
@@ -42,7 +45,11 @@ const MapComponent = () => {
   const { state } = useLocation(); // Get the address passed from UserDashboard
   const navigate = useNavigate();
   const [showProjectModal, setShowProjectModal] = useState(false); // Controls modal visibility
-
+  useEffect(() => {
+    console.log("Updated Polygons:", polygons);
+    console.log("Updated Polylines:", polylines);
+  }, [polygons, polylines]);
+  
   // Open the modal
   const openProjectModal = () => {
     setShowProjectModal(true);
@@ -144,37 +151,30 @@ const MapComponent = () => {
   };
 
   const onOverlayComplete = ($overlayEvent) => {
-    // 🚨 Prevent drawing if there are existing shapes
-    if (polygons.length > 0 || polylines.length > 0) {
-      alert("Cannot make a new shape. Either save the current shape or clear the map first.");
-      $overlayEvent.overlay.setMap(null); // Remove newly drawn shape
-      return;
-    }
-  
     const { type, overlay } = $overlayEvent;
+    const shapeId = Date.now(); // Unique shape ID
   
     if (type === window.google.maps.drawing.OverlayType.POLYGON) {
-      const newPolygon = overlay
-        .getPath()
-        .getArray()
-        .map((latLng) => ({ lat: latLng.lat(), lng: latLng.lng() }));
-  
+      const newPolygon = {
+        shapeId,
+        coordinates: overlay.getPath().getArray().map((latLng) => ({ lat: latLng.lat(), lng: latLng.lng() }))
+      };
       overlay.setMap(null);
-      setPolygons([newPolygon]);
-      fetchNearbyHomes(newPolygon);
+      setPolygons((prev) => [...prev, newPolygon]);
+      fetchNearbyHomes(newPolygon.coordinates, shapeId);
     }
   
     if (type === window.google.maps.drawing.OverlayType.POLYLINE) {
-      const newPolyline = overlay
-        .getPath()
-        .getArray()
-        .map((latLng) => ({ lat: latLng.lat(), lng: latLng.lng() }));
-  
+      const newPolyline = {
+        shapeId,
+        coordinates: overlay.getPath().getArray().map((latLng) => ({ lat: latLng.lat(), lng: latLng.lng() }))
+      };
       overlay.setMap(null);
-      setPolylines([newPolyline]);
-      fetchNearbyHomes(newPolyline);
+      setPolylines((prev) => [...prev, newPolyline]);
+      fetchNearbyHomes(newPolyline.coordinates, shapeId);
     }
   };
+  
   
   
   const handleRightClick = (event, type, index) => {
@@ -223,6 +223,8 @@ const MapComponent = () => {
   
     setPolygons([]);
     setPolylines([]);
+    setActiveMarkers([]); // ✅ Clears all markers
+   setHoveredAddress(null); 
     setHomes([]); // Clear fetched addresses
     setArea(0);
     setPolylineLength(0);
@@ -237,15 +239,15 @@ const MapComponent = () => {
 console.log("Polygons after clear:", polygons);
   };
   
-  const fetchNearbyHomes = async (polygonPath) => {
+  const fetchNearbyHomes = async (shapePath, shapeId) => {
     if (!window.google || !window.google.maps || !window.google.maps.Geocoder || !window.google.maps.geometry) {
       console.error("Google Geocoding API or Geometry API is not loaded.");
       alert("Google Maps API is not available. Please try again.");
       return;
     }
   
-    console.log("Fetching addresses using Reverse Geocoding...");
-    setIsFetchingAddresses(true); // ✅ Show Loading Animation
+    console.log(`Fetching addresses for shape ${shapeId}...`);
+    setIsFetchingAddresses(true);
   
     const geocoder = new window.google.maps.Geocoder();
     const foundHomes = [];
@@ -271,12 +273,11 @@ console.log("Polygons after clear:", polygons);
           }
         }
       }
-
       return points;
     };
   
-    const gridPoints = generateGridPointsInsidePolygon(polygonPath, 15);
-    console.log(`Generated ${gridPoints.length} points inside the polygon for geocoding.`);
+    const gridPoints = generateGridPointsInsidePolygon(shapePath, 15);
+    console.log(`Generated ${gridPoints.length} points inside the shape.`);
   
     for (let i = 0; i < gridPoints.length; i++) {
       const latLng = new window.google.maps.LatLng(gridPoints[i].lat, gridPoints[i].lng);
@@ -304,77 +305,143 @@ console.log("Polygons after clear:", polygons);
       }
     }
   
-    setHomes(foundHomes);
+    setHomes((prevAddresses) => [
+      ...prevAddresses,
+      { shapeId, addresses: foundHomes, showAddresses: false }, // ✅ Add showAddresses
+    ]);
+   
+        
+  
     setIsFetchingAddresses(false);
-    //setCanDraw(false); // ✅ Hide Loading Animation
-    console.log("Final Homes inside Polygon using Geocoding:", foundHomes);
-    //console.log("CanDraw here:", canDraw);
+    console.log(`Final Homes inside Shape ${shapeId}:`, foundHomes);
   };
   
-  
-  const handleDeleteHome = (index) => {
-    setHomes((prevHomes) => prevHomes.filter((_, i) => i !== index));
-  };
-  const handleSaveShape = () => {
-    if (homes.length === 0) {
-      alert("No addresses found to save.");
-      return;
-    }
-  
-    // ✅ Ensure we detect the correct shape type
-    let shapeType = polygons.length > 0 ? "Polygon" : (polylines.length > 0 ? "Polyline" : null);
-    if (!shapeType) {
-      alert("No shape detected. Draw a shape before saving.");
-      return;
-    }
-  
-    let shapeCoordinates = [];
-    let shapeArea = null;
-    let shapeLength = null;
-  
-    if (shapeType === "Polygon") {
-      shapeCoordinates = polygons[0]; // ✅ Get Polygon Coordinates
-      shapeArea = Math.abs(calculateArea(shapeCoordinates)).toFixed(2) + " m²"; // 🔥 Use Math.abs() to avoid negatives
-    } else if (shapeType === "Polyline") {
-      shapeCoordinates = polylines[0]; // ✅ Get Polyline Coordinates
-      shapeLength = calculatePolylineLength(shapeCoordinates).toFixed(2) + " m";
-    }
-  
-    const newShape = {
-      id: Date.now(),
-      shapeType, // ✅ Store correct shape type
-      area: shapeArea,
-      length: shapeLength,
-      coordinates: shapeCoordinates,
-      addresses: homes,
-      showDetails: false,
-    };
-  
-    setSavedShapes((prevShapes) => [...prevShapes, newShape]);
-    setHomes([]); // ✅ Reset addresses but keep shape on map
-    clearMap();
-    alert(`${shapeType} saved successfully!`);
-  };
-  
-  
-  
-  
-  
-  
-  
-  
-  const toggleShapeDetails = (index) => {
-    setSavedShapes((prevShapes) =>
-      prevShapes.map((shape, i) =>
-        i === index ? { ...shape, showDetails: !shape.showDetails } : shape
-      )
+  const toggleShapeAddresses = (shapeId) => {
+    setHomes((prevAddresses) =>
+      prevAddresses.map((shape) => {
+        if (shape.shapeId === shapeId) {
+          const isExpanding = !shape.showAddresses;
+          setSelectedShapeId(isExpanding ? shapeId : null); // ✅ Store shape ID only when opened
+          setActiveMarkers(isExpanding ? shape.addresses : []);
+          return { ...shape, showAddresses: isExpanding };
+        }
+        return shape;
+      })
     );
   };
   
   
-  const handleDeleteShape = (index) => {
-    setSavedShapes((prevShapes) => prevShapes.filter((_, i) => i !== index));
+  
+  
+  const handleDeleteHome = (shapeId, homeIndex) => {
+    setHomes((prevAddresses) =>
+      prevAddresses.map((shape) =>
+        shape.shapeId === shapeId
+          ? { ...shape, addresses: shape.addresses.filter((_, i) => i !== homeIndex) }
+          : shape
+      )
+    );
+  
+    // 🔥 Remove the deleted address from activeMarkers
+    setActiveMarkers((prevMarkers) =>
+      prevMarkers.filter((_, i) => i !== homeIndex) // ✅ Filters out the deleted marker
+    );
   };
+  
+  
+  const handleSaveShape = () => {
+    if (!selectedShapeId) {
+      alert("Please open a shape's collapsible before saving.");
+      return;
+    }
+  
+    // ✅ Find the shape details from `homes`
+    const shapeAddresses = homes.find((shape) => shape.shapeId === selectedShapeId);
+    if (!shapeAddresses) {
+      alert("No valid shape found to save.");
+      return;
+    }
+  
+    // ✅ Find the shape in `polygons` or `polylines`
+    const polygonMatch = polygons.find((p) => p.shapeId === selectedShapeId);
+    const polylineMatch = polylines.find((p) => p.shapeId === selectedShapeId);
+  
+    let shapeType, shapeCoordinates;
+    if (polygonMatch) {
+      shapeType = "Polygon";
+      shapeCoordinates = polygonMatch.coordinates;
+    } else if (polylineMatch) {
+      shapeType = "Polyline";
+      shapeCoordinates = polylineMatch.coordinates;
+    } else {
+      alert("No valid shape found to save.");
+      return;
+    }
+  
+    // ✅ Correctly calculate area or length
+    const shapeArea = shapeType === "Polygon" ? calculateArea(shapeCoordinates) + " m²" : null;
+    const shapeLength = shapeType === "Polyline" ? calculatePolylineLength(shapeCoordinates) + " m" : null;
+  
+    // ✅ Construct shape object
+    const newSavedShape = {
+      id: selectedShapeId,
+      shapeType,
+      area: shapeArea,
+      length: shapeLength,
+      coordinates: shapeCoordinates,
+      addresses: shapeAddresses.addresses,
+      showDetails: false,
+    };
+  
+    console.log("Saving Shape:", newSavedShape);
+    setSavedShapes((prevShapes) => [...prevShapes, newSavedShape]);
+    setSelectedShapeId(null); // ✅ Reset selection after saving
+  
+    alert(`Shape (${shapeType}) saved successfully!`);
+  };
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  const toggleShapeDetails = (shapeId) => {
+    setSavedShapes((prevShapes) => {
+      const updatedShapes = prevShapes.map((shape) =>
+        shape.id === shapeId ? { ...shape, showDetails: !shape.showDetails } : shape
+      );
+      
+      return [...updatedShapes]; // 🔥 Ensures a state update
+    });
+  };
+  
+  
+  
+  
+  
+  const handleDeleteShape = (index) => {
+    setSavedShapes((prevShapes) => {
+      const shapeToDelete = prevShapes[index];
+  
+      // Remove from polygons or polylines state
+      if (shapeToDelete.shapeType === "Polygon") {
+        setPolygons((prevPolygons) => prevPolygons.filter(p => p.shapeId !== shapeToDelete.id));
+      } else if (shapeToDelete.shapeType === "Polyline") {
+        setPolylines((prevPolylines) => prevPolylines.filter(p => p.shapeId !== shapeToDelete.id));
+      }
+  
+      // Remove corresponding addresses from homes list
+      setHomes((prevHomes) => prevHomes.filter(home => home.shapeId !== shapeToDelete.id));
+  
+      return prevShapes.filter((_, i) => i !== index);
+    });
+  };
+  
   
   
 
@@ -454,7 +521,7 @@ console.log("Polygons after clear:", polygons);
   
  
   
-  return isLoaded ? (
+ return  isLoaded ? (
     <div className="map-page-container-unique">
        {/* 🔵 Save Project Modal */}
 {showProjectModal && (
@@ -514,11 +581,12 @@ console.log("Polygons after clear:", polygons);
             {markerPosition && <Marker position={markerPosition} />}
             {polygons.map((polygon, index) => (
               <Polygon
-              key={`polygon-${index}`}
+              key={`polygon-${polygon.shapeId}`}
+
               onLoad={(event) => onLoadPolygon(event, index)}
               onRightClick={(event) => handleRightClick(event, "polygon", index)} // 🛑 Right-Click Delete
               options={polygonOptions}
-              paths={polygon}
+              paths={[...polygon.coordinates]} // ✅ Ensures an array is passed
               draggable
               editable
             />
@@ -526,29 +594,30 @@ console.log("Polygons after clear:", polygons);
             ))}
             {polylines.map((polyline, index) => (
               <Polyline
-              key={`polyline-${index}`}
+              key={`polyline-${polyline.shapeId}`}
               onLoad={(event) => onLoadPolyline(event, index)}
               onRightClick={(event) => handleRightClick(event, "polyline", index)} // 🛑 Right-Click Delete
               options={polylineOptions}
-              path={polyline}
+              path={[...polyline.coordinates]} // ✅ Ensures an array is passed
               draggable
               editable
             />
             
             ))}
-            {homes.map((home, index) => (
+           {activeMarkers.map((home, index) => (
   <Marker
     key={index}
     position={{ lat: home.lat, lng: home.lng }}
     title={home.name}
     icon={{
-      url: hoveredAddress === home.name 
-        ? "http://maps.google.com/mapfiles/ms/icons/yellow-dot.png" // Highlighted Icon
-        : "http://maps.google.com/mapfiles/ms/icons/red-dot.png", // Normal Icon
-      scaledSize: new window.google.maps.Size(40, 40), // Adjust size if needed
+      url: hoveredAddress === home.name
+        ? "http://maps.google.com/mapfiles/ms/icons/yellow-dot.png" // ✅ Highlighted Icon
+        : "http://maps.google.com/mapfiles/ms/icons/red-dot.png", // 🔴 Normal Icon
+      scaledSize: new window.google.maps.Size(40, 40),
     }}
   />
 ))}
+
 
             
           </GoogleMap>
@@ -563,30 +632,48 @@ console.log("Polygons after clear:", polygons);
           {/* Debugging: Check if `homes` state has data */}
           {console.log("Rendering Address List - Homes:", homes)}
           {/* ✅ Show Loading Animation While Fetching Addresses */}
-  {isFetchingAddresses ? (
-    <div className="loading-container">
-      <div className="spinner"></div>
-      <p>Fetching addresses...</p>
-    </div>
-  ) : showHomesList && (
-    <ul className="map-homes-list-unique">
-      {homes.length > 0 ? (
-        homes.map((home, index) => (
-          <li
-            key={index}
-            className="map-home-item-unique"
-            onMouseEnter={() => setHoveredAddress(home.name)}
-            onMouseLeave={() => setHoveredAddress(null)}
+          {isFetchingAddresses ? (
+  <div className="loading-container">
+    <div className="spinner"></div>
+    <p>Fetching addresses...</p>
+  </div>
+) : showHomesList && (
+  <div className="map-homes-list-unique">
+    {homes.length > 0 ? (
+      homes.map((shape, shapeIndex) => (
+        <div key={shape.shapeId} className="shape-address-group">
+          <h4 
+            className="shape-address-header"
+            onClick={() => toggleShapeAddresses(shape.shapeId)} // ✅ Toggle on click
+            style={{ cursor: "pointer" }}
           >
-            {home.name}
-            <button className="map-delete-home-btn-unique" onClick={() => handleDeleteHome(index)}>❌</button>
-          </li>
-        ))
-      ) : (
-        <p className="map-no-homes-msg-unique">No addresses found.</p>
-      )}
-    </ul>
-  )}
+            {`Shape ${shapeIndex + 1} Addresses`} {shape.showAddresses ? "▲" : "▼"}
+          </h4>
+
+          {shape.showAddresses && (
+  <div className="shape-address-list">
+    {shape.addresses.map((home, homeIndex) => (
+      <div key={homeIndex} className="shape-home-item"
+      onMouseEnter={() => setHoveredAddress(home.name)} 
+      onMouseLeave={() => setHoveredAddress(null)} >
+       
+        <p>{home.name}</p>
+        <button className="shape-delete-home-btn" onClick={() => handleDeleteHome(shape.shapeId, homeIndex)}>❌</button>
+      </div>
+    ))}
+  </div>
+)}
+
+        </div>
+      ))
+    ) : (
+      <p className="map-no-homes-msg-unique">No addresses found.</p>
+    )}
+  </div>
+)}
+
+  
+  
   
          
            {/* Save Shape Button */}
@@ -627,13 +714,16 @@ console.log("Polygons after clear:", polygons);
                 ))}
               </ul>
             {/* Addresses List (Collapsible) */}
-            {shape.showDetails && (
-              <ul className="map-shape-address-list-unique">
-                {shape.addresses.map((addr, addrIndex) => (
-                  <li key={addrIndex}>{addr.name}</li>
-                ))}
-              </ul>
-            )}
+            {shape.showDetails && shape.addresses && shape.addresses.length > 0 ? (
+  <ul className="map-shape-address-list-unique">
+    {shape.addresses.map((addr, addrIndex) => (
+      <li key={addrIndex}>{addr.name}</li>
+    ))}
+  </ul>
+) : (
+  shape.showDetails && <p>No addresses found.</p>
+)}
+
 
           </div>
         ))
